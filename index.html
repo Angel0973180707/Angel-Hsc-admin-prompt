@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>幸福天使｜品牌顧問後台</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #c8860a;
+      --gold-pale: #fff7e6;
+      --gold-border: #e8d4a0;
+      --brown-dark: #3d2a0e;
+      --brown-mid: #6b4318;
+      --brown-light: #9a6b3a;
+      --cream: #fffdf7;
+      --green: #2f6f5e;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Noto Sans TC", sans-serif; background: #fdf6e8; color: var(--brown-dark); }
+
+    .header {
+      background: linear-gradient(160deg, #3d2a0e 0%, #7a4a18 60%, #c8860a 100%);
+      padding: 24px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header-icon { font-size: 32px; }
+    .header-text { }
+    .header-title { font-family: "Noto Serif TC", serif; font-size: 18px; font-weight: 900; color: #fff; white-space: nowrap; }
+    .header-sub { font-size: 12px; color: rgba(255,255,255,.7); margin-top: 2px; white-space: nowrap; }
+
+    .wrap { max-width: 780px; margin: 0 auto; padding: 16px 16px 80px; }
+
+    .card { background: #fff; border-radius: 18px; padding: 18px; margin: 12px 0; border: 1px solid #f0e4c8; box-shadow: 0 3px 12px rgba(80,50,20,.06); }
+    .card-title { font-family: "Noto Serif TC", serif; font-size: 15px; font-weight: 900; color: var(--brown-dark); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .card-title .badge { background: var(--gold); color: #fff; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 999px; font-family: "Noto Sans TC", sans-serif; }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+    .field-row.single { grid-template-columns: 1fr; }
+    .field-group { display: flex; flex-direction: column; gap: 4px; }
+    .field-label { font-size: 12px; font-weight: 700; color: var(--brown-mid); }
+
+    input[type="text"], textarea, select {
+      width: 100%; padding: 10px 12px;
+      border: 1.5px solid var(--gold-border);
+      border-radius: 10px; font-size: 14px;
+      font-family: "Noto Sans TC", sans-serif;
+      background: var(--gold-pale); color: var(--brown-dark);
+      outline: none; transition: border-color .2s;
+    }
+    input:focus, textarea:focus, select:focus { border-color: var(--gold); }
+    textarea { resize: vertical; min-height: 80px; line-height: 1.7; }
+    textarea.tall { min-height: 120px; }
+
+    .btn-generate {
+      display: block; width: 100%; padding: 16px;
+      background: linear-gradient(135deg, var(--gold), #e09820);
+      color: #fff; border: none; border-radius: 999px;
+      font-size: 16px; font-weight: 700;
+      font-family: "Noto Sans TC", sans-serif;
+      cursor: pointer; margin-top: 16px;
+      box-shadow: 0 4px 16px rgba(200,134,10,.3);
+      letter-spacing: 1px;
+    }
+    .btn-generate:hover { opacity: .9; }
+
+    .btn-clear {
+      display: block; width: 100%; padding: 12px;
+      background: #f0e4c8; color: var(--brown-mid);
+      border: none; border-radius: 999px;
+      font-size: 14px; font-weight: 700;
+      font-family: "Noto Sans TC", sans-serif;
+      cursor: pointer; margin-top: 8px;
+    }
+
+    /* 結果區 */
+    .result-area { display: none; margin-top: 16px; }
+    .result-area.show { display: block; }
+
+    .result-header {
+      background: linear-gradient(135deg, #3d2a0e, #7a4a18);
+      border-radius: 18px 18px 0 0;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .result-header-title { font-family: "Noto Serif TC", serif; font-size: 16px; font-weight: 900; color: #fff; }
+    .btn-copy-all {
+      background: var(--gold); color: #fff;
+      border: none; border-radius: 999px;
+      padding: 8px 16px; font-size: 13px; font-weight: 700;
+      font-family: "Noto Sans TC", sans-serif;
+      cursor: pointer;
+    }
+    .btn-copy-all.copied { background: #4caf50; }
+
+    .result-body {
+      background: #fff;
+      border: 1px solid #f0e4c8;
+      border-top: none;
+      border-radius: 0 0 18px 18px;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    .result-box {
+      border-bottom: 1px solid #f5ece0;
+      padding: 16px 18px;
+    }
+    .result-box:last-child { border-bottom: none; }
+    .result-box-label {
+      font-size: 11px; font-weight: 700;
+      color: var(--gold); letter-spacing: 1px;
+      margin-bottom: 8px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .result-box-content {
+      font-size: 14px; line-height: 1.9;
+      color: var(--brown-dark);
+      white-space: pre-wrap;
+      word-break: break-word;
+      background: var(--gold-pale);
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .btn-copy-item {
+      background: transparent;
+      border: 1px solid var(--gold-border);
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 11px; font-weight: 700;
+      color: var(--gold);
+      cursor: pointer;
+      font-family: "Noto Sans TC", sans-serif;
+      transition: all .18s;
+      white-space: nowrap;
+    }
+    .btn-copy-item:hover { background: #fff3d0; }
+    .btn-copy-item.copied { background: #e8f5e9; border-color: #4caf50; color: #2e7d32; }
+
+    .section-divider {
+      background: linear-gradient(135deg, var(--gold-pale), #fde9bb);
+      padding: 10px 18px;
+      font-size: 13px; font-weight: 700;
+      color: var(--brown-mid);
+      border-bottom: 1px solid #f5ece0;
+    }
+
+    .notice { background: linear-gradient(135deg, #fff8e6, #fff0cc); border-left: 3px solid var(--gold); padding: 10px 14px; border-radius: 0 10px 10px 0; font-size: 12px; color: var(--brown-light); line-height: 1.8; margin: 10px 0; }
+
+    @media (max-width: 480px) {
+      .field-row { grid-template-columns: 1fr; }
+    }
+
+    /* 密碼鎖定畫面 */
+    #lockScreen {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(160deg, #3d2a0e 0%, #7a4a18 60%, #c8860a 100%);
+      z-index: 9999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+    .lock-icon { font-size: 48px; margin-bottom: 16px; }
+    .lock-title { font-family: "Noto Serif TC", serif; font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 8px; }
+    .lock-sub { font-size: 13px; color: rgba(255,255,255,.7); margin-bottom: 24px; }
+    .lock-input {
+      width: 100%; max-width: 280px;
+      padding: 14px 18px;
+      border: 2px solid rgba(255,255,255,.3);
+      border-radius: 999px;
+      font-size: 18px;
+      text-align: center;
+      background: rgba(255,255,255,.15);
+      color: #fff;
+      outline: none;
+      letter-spacing: 4px;
+      font-family: "Noto Sans TC", sans-serif;
+    }
+    .lock-input::placeholder { color: rgba(255,255,255,.5); letter-spacing: 1px; font-size: 14px; }
+    .lock-input:focus { border-color: rgba(255,255,255,.7); }
+    .lock-btn {
+      margin-top: 14px;
+      width: 100%; max-width: 280px;
+      padding: 14px;
+      background: #fff;
+      color: #c8860a;
+      border: none;
+      border-radius: 999px;
+      font-size: 16px;
+      font-weight: 900;
+      font-family: "Noto Sans TC", sans-serif;
+      cursor: pointer;
+    }
+    .lock-error { color: #ffcccc; font-size: 13px; margin-top: 10px; min-height: 20px; }
+  </style>
+</head>
+<body>
+
+<div id="lockScreen">
+  <div class="lock-icon">☀️</div>
+  <div class="lock-title">幸福天使後台</div>
+  <div class="lock-sub">請輸入密碼進入</div>
+  <input class="lock-input" type="password" id="pwInput" placeholder="輸入密碼" onkeydown="if(event.key==='Enter')checkPw()">
+  <button class="lock-btn" onclick="checkPw()">進入後台</button>
+  <div class="lock-error" id="pwError"></div>
+</div>
+
+<div id="mainContent" style="display:none">
+<div class="header">
+  <div class="header-icon">☀️</div>
+  <div class="header-text">
+    <div class="header-title">幸福天使｜品牌顧問後台</div>
+    <div class="header-sub">填入客戶資料，一鍵產出Claude分析指令</div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="notice">
+    從試算表複製客戶資料填入下方，按「產出指令」後複製，貼給Claude即可取得完整品牌建議。
+  </div>
+
+  <!-- 客戶基本資料 -->
+  <div class="card">
+    <div class="card-title"><span class="badge">1</span>客戶基本資料</div>
+    <div class="field-row">
+      <div class="field-group">
+        <div class="field-label">行業類型</div>
+        <select id="f_industry">
+          <option value="">請選擇</option>
+          <option>健康食品／保健品</option>
+          <option>美業／美容／美甲</option>
+          <option>小農／手作／烘焙</option>
+          <option>講師／顧問／教練</option>
+          <option>房仲／保險／金融</option>
+          <option>餐飲／在地店家</option>
+          <option>生活用品／居家</option>
+          <option>個人品牌／自媒體</option>
+          <option>在家接單／服務業</option>
+          <option>招生／教育</option>
+          <option>其他</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">希望客戶做什麼</div>
+        <select id="f_cta_goal">
+          <option value="">請選擇</option>
+          <option>加LINE諮詢</option>
+          <option>立即預約</option>
+          <option>直接下單購買</option>
+          <option>填問卷了解需求</option>
+          <option>看更多案例作品</option>
+          <option>加入社群</option>
+        </select>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field-group">
+        <div class="field-label">姓名／品牌名稱</div>
+        <input type="text" id="f_name" placeholder="例：王小明 ／ 幸福烘焙坊">
+      </div>
+      <div class="field-group">
+        <div class="field-label">職稱／副標</div>
+        <input type="text" id="f_title" placeholder="例：健康烘焙師">
+      </div>
+    </div>
+    <div class="field-row single">
+      <div class="field-group">
+        <div class="field-label">單位／公司</div>
+        <input type="text" id="f_company" placeholder="例：天使幸福股份有限公司">
+      </div>
+    </div>
+  </div>
+
+  <!-- 品牌故事原料 -->
+  <div class="card">
+    <div class="card-title"><span class="badge">2</span>品牌故事原料</div>
+    <div class="field-row single">
+      <div class="field-group">
+        <div class="field-label">核心故事（為什麼做這件事）</div>
+        <textarea class="tall" id="f_core_story" placeholder="客戶填寫的核心故事，直接複製貼上"></textarea>
+      </div>
+    </div>
+    <div class="field-row single">
+      <div class="field-group">
+        <div class="field-label">目標客群與痛點</div>
+        <textarea id="f_target_audience" placeholder="客戶填寫的目標客群，直接複製貼上"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- 風格偏好 -->
+  <div class="card">
+    <div class="card-title"><span class="badge">3</span>風格偏好</div>
+    <div class="field-row">
+      <div class="field-group">
+        <div class="field-label">品牌風格</div>
+        <select id="f_style">
+          <option value="">請選擇</option>
+          <option>溫暖療癒，像朋友一樣</option>
+          <option>專業權威，讓人信任放心</option>
+          <option>活潑有趣，有能量有感染力</option>
+          <option>質感生活，慢活精緻有品味</option>
+          <option>真實親切，說真話有溫度</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <div class="field-label">不想要的感覺</div>
+        <input type="text" id="f_avoid" placeholder="例：不要太推銷感">
+      </div>
+    </div>
+  </div>
+
+  <!-- 現有平台 -->
+  <div class="card">
+    <div class="card-title"><span class="badge">4</span>現有平台</div>
+    <div class="field-row">
+      <div class="field-group">
+        <div class="field-label">YouTube</div>
+        <input type="text" id="f_youtube" placeholder="有則填">
+      </div>
+      <div class="field-group">
+        <div class="field-label">Facebook</div>
+        <input type="text" id="f_facebook" placeholder="有則填">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field-group">
+        <div class="field-label">Instagram</div>
+        <input type="text" id="f_instagram" placeholder="有則填">
+      </div>
+      <div class="field-group">
+        <div class="field-label">其他平台</div>
+        <input type="text" id="f_other" placeholder="TikTok / 小紅書等">
+      </div>
+    </div>
+  </div>
+
+  <button class="btn-generate" onclick="generate()">產出 Claude 分析指令 ✦</button>
+  <button class="btn-clear" onclick="clearAll()">清除重填</button>
+
+  <!-- 結果區 -->
+  <div class="result-area" id="resultArea">
+    <div class="result-header">
+      <div class="result-header-title">☀️ Claude 分析指令已產出</div>
+      <button class="btn-copy-all" id="btnCopyAll" onclick="copyAll()">複製全部</button>
+    </div>
+    <div class="result-body">
+
+      <div class="section-divider">📋 完整指令（複製後貼給Claude）</div>
+      <div class="result-box">
+        <div class="result-box-label">
+          完整分析指令
+          <button class="btn-copy-item" onclick="copyItem('out_full', this)">複製</button>
+        </div>
+        <div class="result-box-content" id="out_full"></div>
+      </div>
+
+      <div class="section-divider">📇 Part A｜智慧名片建議指令</div>
+      <div class="result-box">
+        <div class="result-box-label">
+          名片建議指令（單獨使用）
+          <button class="btn-copy-item" onclick="copyItem('out_card', this)">複製</button>
+        </div>
+        <div class="result-box-content" id="out_card"></div>
+      </div>
+
+      <div class="section-divider">🎬 Part B｜影音DNA建議指令</div>
+      <div class="result-box">
+        <div class="result-box-label">
+          影音DNA指令（單獨使用）
+          <button class="btn-copy-item" onclick="copyItem('out_video', this)">複製</button>
+        </div>
+        <div class="result-box-content" id="out_video"></div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function v(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+  function generate() {
+    const industry = v('f_industry');
+    const ctaGoal = v('f_cta_goal');
+    const name = v('f_name');
+    const title = v('f_title');
+    const company = v('f_company');
+    const story = v('f_core_story');
+    const audience = v('f_target_audience');
+    const style = v('f_style');
+    const avoid = v('f_avoid');
+    const youtube = v('f_youtube');
+    const facebook = v('f_facebook');
+    const instagram = v('f_instagram');
+    const other = v('f_other');
+
+    if (!name || !story || !audience) {
+      alert('請至少填寫：姓名品牌名稱、核心故事、目標客群');
+      return;
+    }
+
+    const platforms = [
+      youtube ? 'YouTube：' + youtube : '',
+      facebook ? 'Facebook：' + facebook : '',
+      instagram ? 'Instagram：' + instagram : '',
+      other ? '其他：' + other : ''
+    ].filter(Boolean).join('、') || '尚無平台';
+
+    const clientInfo = `【客戶資料】
+行業：${industry || '未填'}
+姓名／品牌：${name}
+職稱：${title || '未填'}
+公司：${company || '未填'}
+希望客戶做什麼：${ctaGoal || '未填'}
+核心故事：${story}
+目標客群與痛點：${audience}
+品牌風格：${style || '未填'}
+不想要的感覺：${avoid || '未填'}
+現有平台：${platforms}`;
+
+    const fullPrompt = `你是「幸福天使品牌顧問」，請根據以下客戶資料，產出完整品牌分析報告。
+
+${clientInfo}
+
+請依序產出以下內容：
+
+📇 Part A｜智慧名片建議
+
+1. 品牌故事
+100-150字，有溫度、真實感，說明為什麼做這件事，適合放在智慧名片上。
+
+2. 一句話理念 × 3版本
+每個版本14字以內（含標點），不能斷行，風格各異讓客戶選擇。
+版本1：
+版本2：
+版本3：
+
+3. 跑馬燈內容
+3-5條訊息，用｜區隔，每條至少15字，適合循環播放。
+
+4. 照片牆建議
+列出3張照片的拍攝方向建議，再附上對應的ChatGPT產圖指令（英文）。
+
+5. CTA按鈕建議
+根據行業和目標，推薦3-5個CTA，每個包含：
+- 按鈕標題（5-10字）
+- 建議連結類型
+- 為什麼適合這個客戶
+
+🎬 Part B｜影音品牌DNA＋製作建議
+
+6. 品牌DNA文件
+- 說話的人：用什麼視角說話
+- 情緒底色：這個品牌給人什麼感覺
+- 慣用語氣：白話／專業／溫暖等
+- 禁止詞：哪些詞絕對不用
+- 慣用意象：哪些畫面或物件常出現
+
+7. 建議發布平台＋頻率
+根據行業和現有平台，推薦1-2個主力平台，說明為什麼，建議發布頻率和最佳時間。
+
+8. 內容主題方向 × 3
+每個主題包含標題＋說明為什麼適合這個客戶。
+
+9. 第一支影音製作指令
+完整指令可直接給AI執行，包含：影片類型、開頭Hook、主要內容、結尾CTA、適合平台。
+
+10. AI產圖指令（ChatGPT DALL-E格式）
+針對這個品牌的影音封面圖，英文，包含風格、色調、構圖、人物、氛圍。`;
+
+    const cardPrompt = `你是「幸福天使品牌顧問」，請根據以下客戶資料，產出智慧名片填寫建議。
+
+${clientInfo}
+
+請產出：
+1. 品牌故事（100-150字，有溫度真實感，適合名片）
+2. 一句話理念 × 3版本（每個14字以內含標點，不能斷行）
+3. 跑馬燈內容（3-5條，用｜區隔，每條至少15字）
+4. 照片牆建議（3張拍攝方向＋ChatGPT產圖指令英文）
+5. CTA按鈕建議（3-5個，含標題、連結類型、理由）`;
+
+    const videoPrompt = `你是「幸福天使品牌顧問」，請根據以下客戶資料，產出影音品牌DNA與製作建議。
+
+${clientInfo}
+
+請產出：
+1. 品牌DNA文件（說話視角、情緒底色、慣用語氣、禁止詞、慣用意象）
+2. 建議發布平台＋頻率（1-2個主力平台，說明原因和最佳發布時間）
+3. 內容主題方向 × 3（標題＋為什麼適合）
+4. 第一支影音製作指令（可直接給AI執行）
+5. AI產圖指令（ChatGPT DALL-E英文格式）`;
+
+    document.getElementById('out_full').textContent = fullPrompt;
+    document.getElementById('out_card').textContent = cardPrompt;
+    document.getElementById('out_video').textContent = videoPrompt;
+
+    document.getElementById('resultArea').classList.add('show');
+    document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function copyItem(id, btn) {
+    const text = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(text).then(function() {
+      btn.textContent = '✓ 已複製';
+      btn.classList.add('copied');
+      setTimeout(function() {
+        btn.textContent = '複製';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  function copyAll() {
+    const full = document.getElementById('out_full').textContent;
+    navigator.clipboard.writeText(full).then(function() {
+      const btn = document.getElementById('btnCopyAll');
+      btn.textContent = '✓ 已複製';
+      btn.classList.add('copied');
+      setTimeout(function() {
+        btn.textContent = '複製全部';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  function clearAll() {
+    if (!confirm('確定要清除所有填寫內容嗎？')) return;
+    ['f_industry','f_cta_goal','f_name','f_title','f_company',
+     'f_core_story','f_target_audience','f_style','f_avoid',
+     'f_youtube','f_facebook','f_instagram','f_other'].forEach(function(id) {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+    document.getElementById('resultArea').classList.remove('show');
+  }
+</script>
+
+</div><!-- /mainContent -->
+
+<script>
+  (function() {
+    const correct = '167777';
+    const key = 'angel_admin_auth';
+    if (sessionStorage.getItem(key) === correct) {
+      document.getElementById('lockScreen').style.display = 'none';
+      document.getElementById('mainContent').style.display = 'block';
+    } else {
+      document.getElementById('lockScreen').style.display = 'flex';
+      document.getElementById('mainContent').style.display = 'none';
+    }
+  })();
+
+  function checkPw() {
+    const input = document.getElementById('pwInput').value;
+    const error = document.getElementById('pwError');
+    if (input === '167777') {
+      sessionStorage.setItem('angel_admin_auth', '167777');
+      document.getElementById('lockScreen').style.display = 'none';
+      document.getElementById('mainContent').style.display = 'block';
+    } else {
+      error.textContent = '密碼錯誤，請再試一次';
+      document.getElementById('pwInput').value = '';
+      document.getElementById('pwInput').focus();
+    }
+  }
+</script>
+</body>
+</html>
