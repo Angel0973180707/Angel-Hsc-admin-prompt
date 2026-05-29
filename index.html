@@ -3,897 +3,758 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>幸福天使｜品牌顧問後台 Pro</title>
+  <title>幸福天使｜品牌顧問後台</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --gold: #b8860b; --gold-light: #d4a017; --gold-bright: #f0c040;
       --gold-pale: #fdf3d8; --gold-border: #e8d4a0;
-      --brown-dark: #2a1a06; --brown-mid: #5a3a14; --brown-light: #8a6030;
-      --cream: #fdfaf3; --dark: #1a1008; --dark-2: #251608;
-      --green: #2f6f5e; --line-green: #06c755;
+      --brown-dark: #2a1a06; --brown-mid: #5a3a14;
+      --dark: #1a1008; --dark-2: #251608; --dark-3: #2e1f0a;
+      --green: #06c755;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: "Noto Sans TC", sans-serif; background: #1a1008; color: #fff; min-height: 100vh; }
+    body { font-family: "Noto Sans TC", sans-serif; background: var(--dark); color: #fff; min-height: 100vh; }
 
-    /* 鎖定畫面 */
+    /* 鎖定 */
     #lockScreen {
       display: flex; position: fixed; inset: 0;
-      background: linear-gradient(160deg, #1a1008, #2e1f0a, #1a1008);
-      z-index: 9999; flex-direction: column; align-items: center; justify-content: center; padding: 24px;
+      background: linear-gradient(160deg, var(--dark), var(--dark-3));
+      z-index: 9999; flex-direction: column;
+      align-items: center; justify-content: center; padding: 24px;
     }
-    .lock-sun { font-size: 52px; margin-bottom: 14px; filter: drop-shadow(0 0 20px rgba(212,160,23,.9)); }
+    .lock-sun { font-size: 52px; margin-bottom: 12px; filter: drop-shadow(0 0 20px rgba(212,160,23,.9)); }
     .lock-title { font-family: "Noto Serif TC", serif; font-size: 20px; font-weight: 900; color: #fff; margin-bottom: 4px; }
-    .lock-sub { font-size: 12px; color: rgba(255,255,255,.4); margin-bottom: 28px; letter-spacing: 1px; }
+    .lock-sub { font-size: 11px; color: rgba(255,255,255,.35); margin-bottom: 28px; letter-spacing: 2px; }
     .lock-input {
       width: 100%; max-width: 260px; padding: 14px 18px;
-      border: 1px solid rgba(184,134,11,.4); border-radius: 12px;
-      font-size: 20px; text-align: center;
+      border: 1px solid rgba(184,134,11,.3); border-radius: 12px;
+      font-size: 22px; text-align: center;
       background: rgba(255,255,255,.06); color: #fff;
-      outline: none; letter-spacing: 6px;
+      outline: none; letter-spacing: 8px;
       font-family: "Noto Sans TC", sans-serif;
     }
     .lock-input:focus { border-color: var(--gold); }
     .lock-btn {
-      margin-top: 12px; width: 100%; max-width: 260px; padding: 14px;
+      margin-top: 10px; width: 100%; max-width: 260px; padding: 14px;
       background: linear-gradient(135deg, var(--gold), var(--gold-light));
       color: #fff; border: none; border-radius: 12px;
       font-size: 15px; font-weight: 900;
       font-family: "Noto Sans TC", sans-serif; cursor: pointer;
     }
-    .lock-error { color: rgba(255,100,100,.8); font-size: 12px; margin-top: 8px; min-height: 18px; }
+    .lock-err { color: rgba(255,100,100,.7); font-size: 12px; margin-top: 8px; min-height: 18px; }
 
-    #mainContent { display: none; }
+    #main { display: none; }
 
     /* 頂部 */
-    .header {
-      background: linear-gradient(135deg, #1a1008, #2e1f0a);
-      border-bottom: 1px solid rgba(184,134,11,.2);
-      padding: 16px 20px;
-      display: flex; align-items: center; gap: 12px;
+    .hdr {
+      background: linear-gradient(135deg, var(--dark), var(--dark-3));
+      border-bottom: 1px solid rgba(184,134,11,.15);
+      padding: 14px 20px;
+      display: flex; align-items: center; gap: 10px;
       position: sticky; top: 0; z-index: 100;
     }
-    .header-sun { font-size: 28px; filter: drop-shadow(0 0 10px rgba(212,160,23,.7)); }
-    .header-title { font-family: "Noto Serif TC", serif; font-size: 16px; font-weight: 900; color: #fff; white-space: nowrap; }
-    .header-sub { font-size: 11px; color: rgba(255,255,255,.4); margin-top: 1px; }
-    .header-badge {
+    .hdr-sun { font-size: 26px; }
+    .hdr-title { font-family: "Noto Serif TC", serif; font-size: 15px; font-weight: 900; color: #fff; }
+    .hdr-sub { font-size: 10px; color: rgba(255,255,255,.35); margin-top: 1px; }
+    .hdr-badge {
       margin-left: auto;
-      background: rgba(184,134,11,.2);
-      border: 1px solid rgba(184,134,11,.3);
+      background: rgba(184,134,11,.15);
+      border: 1px solid rgba(184,134,11,.25);
       color: var(--gold-bright);
       font-size: 10px; font-weight: 700;
-      padding: 4px 10px; border-radius: 999px;
-      letter-spacing: 1px; white-space: nowrap;
+      padding: 3px 10px; border-radius: 999px; letter-spacing: 1px;
     }
 
-    .wrap { max-width: 780px; margin: 0 auto; padding: 16px 16px 80px; }
+    .wrap { max-width: 680px; margin: 0 auto; padding: 16px 16px 80px; }
 
-    /* 區塊標題 */
-    .block-label {
-      font-size: 10px; font-weight: 700; letter-spacing: 2px;
-      color: var(--gold); margin-bottom: 8px;
-      display: flex; align-items: center; gap: 6px;
+    /* 步驟標籤 */
+    .step-label {
+      display: flex; align-items: center; gap: 10px;
+      margin: 20px 0 10px;
     }
-    .block-label::after { content: ''; flex: 1; height: 1px; background: rgba(184,134,11,.2); }
+    .step-num {
+      width: 28px; height: 28px;
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      color: #fff; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 900; flex-shrink: 0;
+    }
+    .step-text { font-size: 13px; font-weight: 700; color: rgba(255,255,255,.7); }
+    .step-line { flex: 1; height: 1px; background: rgba(184,134,11,.15); }
 
     /* 卡片 */
     .card {
       background: rgba(255,255,255,.05);
-      border: 1px solid rgba(184,134,11,.15);
-      border-radius: 16px; padding: 18px; margin: 10px 0;
+      border: 1px solid rgba(184,134,11,.12);
+      border-radius: 16px; padding: 18px;
     }
-    .card-title { font-size: 13px; font-weight: 700; color: rgba(255,255,255,.8); margin-bottom: 12px; }
+    .card-hint { font-size: 12px; color: rgba(255,255,255,.35); line-height: 1.7; margin-bottom: 10px; }
 
-    /* 表單元素 */
-    .field-label { display: block; font-size: 11px; font-weight: 700; color: rgba(255,255,255,.45); margin: 10px 0 4px; letter-spacing: .5px; }
-    select, input[type="text"], textarea {
-      width: 100%; padding: 10px 12px;
-      background: rgba(255,255,255,.07);
+    textarea {
+      width: 100%; padding: 12px 14px;
+      background: rgba(255,255,255,.06);
       border: 1px solid rgba(184,134,11,.2);
       border-radius: 10px; color: #fff;
       font-size: 14px; font-family: "Noto Sans TC", sans-serif;
       outline: none; transition: border-color .2s;
+      resize: vertical; min-height: 70px; line-height: 1.7;
     }
-    select:focus, input:focus, textarea:focus { border-color: var(--gold); }
-    select option { background: #2a1a06; color: #fff; }
-    textarea { resize: vertical; min-height: 80px; line-height: 1.7; }
-    textarea.tall { min-height: 120px; }
+    textarea:focus { border-color: var(--gold); }
+
+    /* 預覽 */
+    .preview {
+      display: none; margin-top: 12px;
+      background: rgba(184,134,11,.07);
+      border: 1px solid rgba(184,134,11,.18);
+      border-radius: 10px; padding: 12px;
+      grid-template-columns: 1fr 1fr; gap: 8px;
+    }
+    .preview.show { display: grid; }
+    .pf-key { font-size: 10px; font-weight: 700; color: var(--gold); margin-bottom: 2px; letter-spacing: .5px; }
+    .pf-val { font-size: 12px; color: rgba(255,255,255,.7); line-height: 1.5; word-break: break-all; }
+    .pf-val.empty { color: rgba(255,255,255,.2); font-style: italic; }
 
     /* 方案選擇 */
-    .plan-selector { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+    .plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     .plan-opt {
       background: rgba(255,255,255,.05);
-      border: 1px solid rgba(184,134,11,.15);
-      border-radius: 10px; padding: 12px 14px;
-      display: flex; align-items: flex-start; gap: 10px;
-      cursor: pointer; transition: all .18s;
+      border: 1.5px solid rgba(184,134,11,.15);
+      border-radius: 12px; padding: 14px 12px;
+      cursor: pointer; transition: all .18s; text-align: center;
     }
-    .plan-opt input[type="radio"] { accent-color: var(--gold); width: 15px; height: 15px; flex-shrink: 0; margin-top: 2px; }
-    .plan-opt.selected { background: rgba(184,134,11,.12); border-color: var(--gold); }
-    .plan-opt-name { font-size: 13px; font-weight: 700; color: #fff; }
-    .plan-opt-desc { font-size: 11px; color: rgba(255,255,255,.4); margin-top: 2px; line-height: 1.5; }
-
-    /* 欄位行 */
-    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-    /* 貼上區 */
-    .paste-area {
-      background: rgba(255,255,255,.04);
-      border: 1px dashed rgba(184,134,11,.3);
-      border-radius: 12px; padding: 14px;
-      margin-top: 10px;
+    .plan-opt input { display: none; }
+    .plan-opt.sel {
+      background: rgba(184,134,11,.15);
+      border-color: var(--gold);
+      box-shadow: 0 0 0 1px rgba(184,134,11,.2);
     }
-    .paste-hint { font-size: 11px; color: rgba(255,255,255,.35); margin-bottom: 8px; line-height: 1.6; }
-    .paste-preview {
-      display: none; margin-top: 10px;
-      background: rgba(184,134,11,.08);
-      border: 1px solid rgba(184,134,11,.2);
-      border-radius: 10px; padding: 12px;
-    }
-    .paste-preview.show { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
-    .preview-field { font-size: 11px; }
-    .preview-key { color: var(--gold); font-weight: 700; margin-bottom: 2px; }
-    .preview-val { color: rgba(255,255,255,.7); line-height: 1.4; word-break: break-all; }
-    .preview-val.empty { color: rgba(255,255,255,.2); font-style: italic; }
+    .plan-icon { font-size: 22px; margin-bottom: 6px; }
+    .plan-name { font-size: 13px; font-weight: 900; color: #fff; margin-bottom: 3px; }
+    .plan-desc { font-size: 11px; color: rgba(255,255,255,.4); line-height: 1.5; }
 
-    /* 生成按鈕 */
+    /* 按鈕 */
     .gen-btn {
-      display: block; width: 100%; padding: 15px;
+      display: block; width: 100%; padding: 16px;
       background: linear-gradient(135deg, var(--gold), var(--gold-light));
       color: #fff; border: none; border-radius: 12px;
       font-size: 15px; font-weight: 900;
-      font-family: "Noto Sans TC", sans-serif;
-      cursor: pointer; margin-top: 14px;
+      font-family: "Noto Sans TC", sans-serif; cursor: pointer;
+      margin-top: 14px; letter-spacing: .5px;
       box-shadow: 0 4px 16px rgba(184,134,11,.3);
-      letter-spacing: .5px;
     }
-    .clear-btn {
+    .clr-btn {
       display: block; width: 100%; padding: 11px;
-      background: rgba(255,255,255,.06);
-      color: rgba(255,255,255,.5); border: 1px solid rgba(255,255,255,.1);
+      background: transparent; color: rgba(255,255,255,.35);
+      border: 1px solid rgba(255,255,255,.08);
       border-radius: 12px; font-size: 13px; font-weight: 700;
       font-family: "Noto Sans TC", sans-serif; cursor: pointer; margin-top: 8px;
     }
 
-    /* 結果區 */
-    .result-area { display: none; margin-top: 16px; }
-    .result-area.show { display: block; }
+    /* 結果 */
+    .result { display: none; margin-top: 20px; }
+    .result.show { display: block; }
 
-    .result-header {
-      background: linear-gradient(135deg, rgba(184,134,11,.2), rgba(212,160,23,.1));
+    .result-hdr {
+      background: linear-gradient(135deg, rgba(184,134,11,.2), rgba(212,160,23,.08));
       border: 1px solid rgba(184,134,11,.3);
-      border-radius: 16px 16px 0 0;
-      padding: 16px 18px;
+      border-radius: 14px 14px 0 0;
+      padding: 14px 16px;
       display: flex; align-items: center; justify-content: space-between;
     }
-    .result-header-title { font-family: "Noto Serif TC", serif; font-size: 15px; font-weight: 900; color: #fff; }
-    .copy-all-btn {
+    .result-hdr-title { font-family: "Noto Serif TC", serif; font-size: 14px; font-weight: 900; color: #fff; }
+    .copy-all {
       background: var(--gold); color: #fff; border: none;
-      border-radius: 999px; padding: 7px 16px;
-      font-size: 12px; font-weight: 700;
+      border-radius: 999px; padding: 6px 14px;
+      font-size: 11px; font-weight: 900;
       font-family: "Noto Sans TC", sans-serif; cursor: pointer;
+      white-space: nowrap;
     }
-    .copy-all-btn.copied { background: #4caf50; }
+    .copy-all.done { background: #4caf50; }
 
-    /* Tab */
-    .result-tabs {
-      display: flex;
-      background: rgba(255,255,255,.04);
+    .tabs {
+      display: flex; overflow-x: auto;
+      background: rgba(255,255,255,.03);
       border-left: 1px solid rgba(184,134,11,.2);
       border-right: 1px solid rgba(184,134,11,.2);
-      overflow-x: auto;
     }
-    .rtab {
-      flex-shrink: 0; padding: 11px 14px;
-      font-size: 12px; font-weight: 700; color: rgba(255,255,255,.4);
-      cursor: pointer; border: none; background: transparent;
+    .tab {
+      flex-shrink: 0; padding: 10px 14px;
+      font-size: 11px; font-weight: 700;
+      color: rgba(255,255,255,.35); cursor: pointer;
+      border: none; background: transparent;
       font-family: "Noto Sans TC", sans-serif;
       border-bottom: 2px solid transparent;
-      transition: all .2s; white-space: nowrap;
+      transition: all .18s; white-space: nowrap;
     }
-    .rtab.active { color: var(--gold-bright); border-bottom-color: var(--gold); }
+    .tab.on { color: var(--gold-bright); border-bottom-color: var(--gold); }
 
-    .rtab-content { display: none; }
-    .rtab-content.active { display: block; }
+    .tab-pane { display: none; }
+    .tab-pane.on { display: block; }
 
     .result-body {
       background: rgba(255,255,255,.03);
-      border: 1px solid rgba(184,134,11,.2);
-      border-top: none;
-      border-radius: 0 0 16px 16px;
-      padding: 18px;
+      border: 1px solid rgba(184,134,11,.15);
+      border-top: none; border-radius: 0 0 14px 14px;
+      padding: 16px;
     }
-    .result-text {
+    .out-text {
       font-size: 13px; line-height: 1.9; color: rgba(255,255,255,.8);
       white-space: pre-wrap; word-break: break-word;
       background: rgba(255,255,255,.04);
-      border: 1px solid rgba(184,134,11,.15);
+      border: 1px solid rgba(184,134,11,.12);
       border-radius: 10px; padding: 14px;
-      max-height: 60vh; overflow-y: auto;
+      max-height: 55vh; overflow-y: auto;
     }
     .copy-btn {
       display: inline-flex; align-items: center; gap: 4px;
-      background: rgba(184,134,11,.15);
-      border: 1px solid rgba(184,134,11,.3);
+      background: rgba(184,134,11,.12);
+      border: 1px solid rgba(184,134,11,.25);
       color: var(--gold-bright); border-radius: 999px;
-      padding: 8px 16px; font-size: 12px; font-weight: 700;
+      padding: 7px 14px; font-size: 11px; font-weight: 700;
       font-family: "Noto Sans TC", sans-serif; cursor: pointer;
-      margin-top: 10px; transition: all .18s;
+      margin-top: 10px;
     }
-    .copy-btn.copied { background: rgba(76,175,80,.2); border-color: #4caf50; color: #4caf50; }
+    .copy-btn.done { background: rgba(76,175,80,.15); border-color: #4caf50; color: #4caf50; }
 
-    @media (max-width: 480px) {
-      .field-row { grid-template-columns: 1fr; }
-      .paste-preview.show { grid-template-columns: 1fr; }
+    @media (max-width: 400px) {
+      .plan-grid { grid-template-columns: 1fr; }
+      .preview.show { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-<!-- 鎖定畫面 -->
 <div id="lockScreen">
   <div class="lock-sun">☀️</div>
-  <div class="lock-title">幸福天使後台 Pro</div>
+  <div class="lock-title">幸福天使後台</div>
   <div class="lock-sub">品牌顧問指令中心</div>
-  <input class="lock-input" type="password" id="pwInput" placeholder="輸入密碼" onkeydown="if(event.key==='Enter')checkPw()">
-  <button class="lock-btn" onclick="checkPw()">進入後台</button>
-  <div class="lock-error" id="pwError"></div>
+  <input class="lock-input" type="password" id="pw" placeholder="密碼" onkeydown="if(event.key==='Enter')unlock()">
+  <button class="lock-btn" onclick="unlock()">進入</button>
+  <div class="lock-err" id="pwErr"></div>
 </div>
 
-<div id="mainContent">
-
-<div class="header">
-  <div class="header-sun">☀️</div>
-  <div>
-    <div class="header-title">幸福天使｜品牌顧問後台</div>
-    <div class="header-sub">AI協作指令產出中心</div>
-  </div>
-  <div class="header-badge">PRO VERSION</div>
-</div>
-
-<div class="wrap">
-
-  <!-- 模式一：貼上試算表 -->
-  <div class="block-label">快速模式｜從試算表貼入</div>
-  <div class="card">
-    <div class="card-title">貼上客戶素材庫資料（整行複製貼上）</div>
-    <div class="paste-area">
-      <div class="paste-hint">① 開試算表 02_品牌素材庫 → ② 選取客戶整行 → ③ 複製 → ④ 貼在這裡</div>
-      <textarea id="pasteArea" rows="3" placeholder="貼上從試算表複製的整行資料…" oninput="parseRow()"></textarea>
+<div id="main">
+  <div class="hdr">
+    <div class="hdr-sun">☀️</div>
+    <div>
+      <div class="hdr-title">幸福天使｜品牌顧問後台</div>
+      <div class="hdr-sub">AI 協作指令產出中心</div>
     </div>
-    <div class="paste-preview" id="previewGrid"></div>
+    <div class="hdr-badge">PRO</div>
   </div>
 
-  <!-- 模式二：手動填寫 -->
-  <div class="block-label" style="margin-top:20px">精準模式｜手動填寫客戶資料</div>
-  <div class="card">
-    <div class="field-row">
-      <div>
-        <div class="field-label">行業類型</div>
-        <select id="f_industry">
-          <option value="">請選擇</option>
-          <option>健康食品／保健品</option>
-          <option>美業／美容／美甲</option>
-          <option>小農／手作／烘焙</option>
-          <option>講師／顧問／教練</option>
-          <option>房仲／保險／金融</option>
-          <option>餐飲／在地店家</option>
-          <option>生活用品／居家</option>
-          <option>個人品牌／自媒體</option>
-          <option>在家接單／服務業</option>
-          <option>招生／教育</option>
-          <option>其他</option>
-        </select>
-      </div>
-      <div>
-        <div class="field-label">希望客戶做什麼</div>
-        <select id="f_cta_goal">
-          <option value="">請選擇</option>
-          <option>加LINE諮詢</option>
-          <option>立即預約</option>
-          <option>直接下單購買</option>
-          <option>填問卷了解需求</option>
-          <option>看更多案例作品</option>
-          <option>加入社群</option>
-        </select>
+  <div class="wrap">
+
+    <!-- STEP 1 -->
+    <div class="step-label">
+      <div class="step-num">1</div>
+      <div class="step-text">從試算表貼上客戶資料</div>
+      <div class="step-line"></div>
+    </div>
+    <div class="card">
+      <div class="card-hint">開試算表 03_品牌素材庫 → 選客戶整行（點行號）→ 複製 → 貼在這裡</div>
+      <textarea id="paste" rows="3" placeholder="貼上整行資料…" oninput="parse()"></textarea>
+      <div class="preview" id="prev"></div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step-label">
+      <div class="step-num">2</div>
+      <div class="step-text">選擇合作方案</div>
+      <div class="step-line"></div>
+    </div>
+    <div class="card">
+      <div class="plan-grid">
+        <label class="plan-opt" id="p1">
+          <input type="radio" name="plan" value="名片建卡">
+          <div class="plan-icon">📇</div>
+          <div class="plan-name">名片建卡</div>
+          <div class="plan-desc">只做智慧名片<br>產出建卡建議</div>
+        </label>
+        <label class="plan-opt" id="p2">
+          <input type="radio" name="plan" value="基礎">
+          <div class="plan-icon">💡</div>
+          <div class="plan-name">基礎方案</div>
+          <div class="plan-desc">指令包＋教學<br>客戶自己操作</div>
+        </label>
+        <label class="plan-opt" id="p3">
+          <input type="radio" name="plan" value="中階">
+          <div class="plan-icon">📱</div>
+          <div class="plan-name">中階方案</div>
+          <div class="plan-desc">半代工產出<br>客戶自己發布</div>
+        </label>
+        <label class="plan-opt" id="p4">
+          <input type="radio" name="plan" value="全包">
+          <div class="plan-icon">🚀</div>
+          <div class="plan-name">全包代操</div>
+          <div class="plan-desc">產出到發布<br>全部你來</div>
+        </label>
       </div>
     </div>
-    <div class="field-row" style="margin-top:8px">
-      <div>
-        <div class="field-label">姓名／品牌名稱</div>
-        <input type="text" id="f_name" placeholder="例：王小明 ／ 幸福烘焙坊">
+
+    <!-- STEP 3 -->
+    <div class="step-label">
+      <div class="step-num">3</div>
+      <div class="step-text">產出 AI 協作指令包</div>
+      <div class="step-line"></div>
+    </div>
+    <button class="gen-btn" onclick="gen()">產出指令包 ✦</button>
+    <button class="clr-btn" onclick="clr()">清除重填</button>
+
+    <!-- 結果 -->
+    <div class="result" id="result">
+      <div class="result-hdr">
+        <div class="result-hdr-title">☀️ 指令包已產出</div>
+        <button class="copy-all" id="caBtn" onclick="copyAll()">複製全部</button>
       </div>
-      <div>
-        <div class="field-label">職稱／副標</div>
-        <input type="text" id="f_title" placeholder="例：健康烘焙師">
+      <div class="tabs">
+        <button class="tab on" onclick="sw(0,this)">📋 完整版</button>
+        <button class="tab" onclick="sw(1,this)">📇 名片建議</button>
+        <button class="tab" onclick="sw(2,this)">🎬 影音DNA</button>
+        <button class="tab" onclick="sw(3,this)">📦 交付清單</button>
+        <button class="tab" onclick="sw(4,this)">📅 時間軸</button>
+        <button class="tab" onclick="sw(5,this)">💬 LINE摘要</button>
+      </div>
+      <div class="result-body">
+        <div class="tab-pane on" id="t0"><div class="out-text" id="o0"></div><button class="copy-btn" onclick="cp('o0',this)">複製</button></div>
+        <div class="tab-pane" id="t1"><div class="out-text" id="o1"></div><button class="copy-btn" onclick="cp('o1',this)">複製</button></div>
+        <div class="tab-pane" id="t2"><div class="out-text" id="o2"></div><button class="copy-btn" onclick="cp('o2',this)">複製</button></div>
+        <div class="tab-pane" id="t3"><div class="out-text" id="o3"></div><button class="copy-btn" onclick="cp('o3',this)">複製</button></div>
+        <div class="tab-pane" id="t4"><div class="out-text" id="o4"></div><button class="copy-btn" onclick="cp('o4',this)">複製</button></div>
+        <div class="tab-pane" id="t5"><div class="out-text" id="o5"></div><button class="copy-btn" onclick="cp('o5',this)">複製</button></div>
       </div>
     </div>
-    <div style="margin-top:8px">
-      <div class="field-label">核心故事（為什麼做這件事）</div>
-      <textarea class="tall" id="f_core_story" placeholder="客戶的核心故事…"></textarea>
-    </div>
-    <div style="margin-top:8px">
-      <div class="field-label">目標客群與痛點</div>
-      <textarea id="f_target_audience" placeholder="目標客群描述…"></textarea>
-    </div>
-    <div class="field-row" style="margin-top:8px">
-      <div>
-        <div class="field-label">品牌風格</div>
-        <select id="f_style">
-          <option value="">請選擇</option>
-          <option>溫暖療癒，像朋友一樣</option>
-          <option>專業權威，讓人信任放心</option>
-          <option>活潑有趣，有能量有感染力</option>
-          <option>質感生活，慢活精緻有品味</option>
-          <option>真實親切，說真話有溫度</option>
-        </select>
-      </div>
-      <div>
-        <div class="field-label">不想要的感覺</div>
-        <input type="text" id="f_avoid" placeholder="例：不要太推銷感">
-      </div>
-    </div>
-    <div class="field-row" style="margin-top:8px">
-      <div>
-        <div class="field-label">有無實體據點</div>
-        <select id="f_location">
-          <option value="">請選擇</option>
-          <option>有店面／工作室</option>
-          <option>在家接單</option>
-          <option>線上為主</option>
-        </select>
-      </div>
-      <div>
-        <div class="field-label">現有平台</div>
-        <input type="text" id="f_platforms" placeholder="例：FB、IG、YouTube">
-      </div>
-    </div>
+
   </div>
-
-  <!-- 合作方案選擇 -->
-  <div class="block-label" style="margin-top:20px">合作方案｜決定交付內容</div>
-  <div class="card">
-    <div class="card-title">選擇合作方案（影響指令產出內容）</div>
-    <div class="plan-selector">
-      <label class="plan-opt" id="planOpt1">
-        <input type="radio" name="plan" value="基礎" onchange="selectPlan(this)">
-        <div>
-          <div class="plan-opt-name">💡 基礎方案｜指令包＋教學</div>
-          <div class="plan-opt-desc">給客戶自己操作的指令包，你負責教學和設定方向</div>
-        </div>
-      </label>
-      <label class="plan-opt" id="planOpt2">
-        <input type="radio" name="plan" value="中階" onchange="selectPlan(this)">
-        <div>
-          <div class="plan-opt-name">📱 中階方案｜半代工</div>
-          <div class="plan-opt-desc">你幫客戶產出文案、圖文、腳本，客戶自己發布</div>
-        </div>
-      </label>
-      <label class="plan-opt" id="planOpt3">
-        <input type="radio" name="plan" value="全包" onchange="selectPlan(this)">
-        <div>
-          <div class="plan-opt-name">🚀 全包方案｜代操</div>
-          <div class="plan-opt-desc">從內容產出到排程發布全部你來，客戶只看成果</div>
-        </div>
-      </label>
-      <label class="plan-opt" id="planOpt4">
-        <input type="radio" name="plan" value="名片建卡" onchange="selectPlan(this)">
-        <div>
-          <div class="plan-opt-name">📇 名片建卡方案</div>
-          <div class="plan-opt-desc">只做智慧名片建卡，產出名片內容建議</div>
-        </div>
-      </label>
-    </div>
-  </div>
-
-  <button class="gen-btn" onclick="generate()">產出 AI 協作指令包 ✦</button>
-  <button class="clear-btn" onclick="clearAll()">清除重填</button>
-
-  <!-- 結果區 -->
-  <div class="result-area" id="resultArea">
-    <div class="result-header">
-      <div class="result-header-title">☀️ AI 協作指令包已產出</div>
-      <button class="copy-all-btn" id="copyAllBtn" onclick="copyAll()">複製全部</button>
-    </div>
-    <div class="result-tabs">
-      <button class="rtab active" onclick="switchTab(0,this)">📋 完整版</button>
-      <button class="rtab" onclick="switchTab(1,this)">📇 名片建議</button>
-      <button class="rtab" onclick="switchTab(2,this)">🎬 影音DNA</button>
-      <button class="rtab" onclick="switchTab(3,this)">📦 交付清單</button>
-      <button class="rtab" onclick="switchTab(4,this)">📅 執行時間軸</button>
-    </div>
-    <div class="result-body">
-      <div class="rtab-content active" id="tab0">
-        <div class="result-text" id="out_full"></div>
-        <button class="copy-btn" onclick="copyOut('out_full',this)">複製完整指令</button>
-      </div>
-      <div class="rtab-content" id="tab1">
-        <div class="result-text" id="out_card"></div>
-        <button class="copy-btn" onclick="copyOut('out_card',this)">複製名片指令</button>
-      </div>
-      <div class="rtab-content" id="tab2">
-        <div class="result-text" id="out_video"></div>
-        <button class="copy-btn" onclick="copyOut('out_video',this)">複製影音指令</button>
-      </div>
-      <div class="rtab-content" id="tab3">
-        <div class="result-text" id="out_delivery"></div>
-        <button class="copy-btn" onclick="copyOut('out_delivery',this)">複製交付清單</button>
-      </div>
-      <div class="rtab-content" id="tab4">
-        <div class="result-text" id="out_timeline"></div>
-        <button class="copy-btn" onclick="copyOut('out_timeline',this)">複製時間軸</button>
-      </div>
-    </div>
-  </div>
-
-</div>
 </div>
 
 <script>
-  const PW = '167777';
-  const SK = 'angel_admin_pro';
+const PW='167777', SK='angel_pro';
+(()=>{ if(sessionStorage.getItem(SK)===PW){ document.getElementById('lockScreen').style.display='none'; document.getElementById('main').style.display='block'; } })();
+function unlock(){ if(document.getElementById('pw').value===PW){ sessionStorage.setItem(SK,PW); document.getElementById('lockScreen').style.display='none'; document.getElementById('main').style.display='block'; } else { document.getElementById('pwErr').textContent='密碼錯誤'; document.getElementById('pw').value=''; } }
 
-  (function() {
-    if (sessionStorage.getItem(SK) === PW) {
-      document.getElementById('lockScreen').style.display = 'none';
-      document.getElementById('mainContent').style.display = 'block';
-    }
-  })();
+// 欄位對應 03_品牌素材庫
+const COLS=[
+  {k:'送出時間',i:0},{k:'行業',i:1},{k:'CTA目標',i:2},
+  {k:'姓名品牌',i:3},{k:'職稱',i:4},{k:'公司',i:5},
+  {k:'核心故事',i:6},{k:'目標客群',i:7},
+  {k:'品牌風格',i:8},{k:'不想要',i:9},
+  {k:'電話',i:10},{k:'Email',i:11},
+  {k:'LINE個人',i:12},{k:'LINE官方',i:13},{k:'地址',i:14},
+  {k:'YouTube',i:15},{k:'Facebook',i:16},{k:'Instagram',i:17},{k:'其他平台',i:18}
+];
+let D={};
 
-  function checkPw() {
-    if (document.getElementById('pwInput').value === PW) {
-      sessionStorage.setItem(SK, PW);
-      document.getElementById('lockScreen').style.display = 'none';
-      document.getElementById('mainContent').style.display = 'block';
-    } else {
-      document.getElementById('pwError').textContent = '密碼錯誤';
-      document.getElementById('pwInput').value = '';
-    }
+function parse(){
+  const raw=document.getElementById('paste').value.trim();
+  if(!raw){document.getElementById('prev').classList.remove('show');return;}
+  const cols=raw.split('\t');
+  D={};
+  COLS.forEach(f=>{ D[f.k]=(cols[f.i]||'').trim(); });
+  const prev=document.getElementById('prev');
+  prev.innerHTML=COLS.slice(1,10).map(f=>{
+    const v=D[f.k];
+    return `<div><div class="pf-key">${f.k}</div><div class="pf-val${v?'':' empty'}">${v||'未填'}</div></div>`;
+  }).join('');
+  prev.classList.add('show');
+}
+
+function planVal(){ const el=document.querySelector('input[name="plan"]:checked'); return el?el.value:''; }
+
+document.addEventListener('change',e=>{
+  if(e.target.name==='plan'){
+    document.querySelectorAll('.plan-opt').forEach(o=>o.classList.remove('sel'));
+    e.target.closest('.plan-opt').classList.add('sel');
   }
+});
 
-  // 試算表欄位對應
-  const FIELDS = [
-    { key: '送出時間', idx: 0 }, { key: '行業', idx: 1 }, { key: '希望客戶做什麼', idx: 2 },
-    { key: '姓名品牌', idx: 3 }, { key: '職稱', idx: 4 }, { key: '公司', idx: 5 },
-    { key: '核心故事', idx: 6 }, { key: '目標客群', idx: 7 },
-    { key: '品牌風格', idx: 8 }, { key: '不想要', idx: 9 },
-    { key: '電話', idx: 10 }, { key: 'Email', idx: 11 },
-    { key: 'LINE個人', idx: 12 }, { key: 'LINE官方', idx: 13 }, { key: '地址', idx: 14 },
-    { key: 'YouTube', idx: 15 }, { key: 'Facebook', idx: 16 },
-    { key: 'Instagram', idx: 17 }, { key: '其他平台', idx: 18 }
-  ];
+function platforms(){ return [D['YouTube'],D['Facebook'],D['Instagram'],D['其他平台']].filter(Boolean).join('、')||'尚無平台'; }
 
-  let parsed = {};
+function gen(){
+  if(!D['姓名品牌']){alert('請先貼上客戶資料');return;}
+  const plan=planVal();
+  if(!plan){alert('請選擇合作方案');return;}
 
-  function parseRow() {
-    const raw = document.getElementById('pasteArea').value.trim();
-    if (!raw) { document.getElementById('previewGrid').classList.remove('show'); return; }
-    const cols = raw.split('\t');
-    parsed = {};
-    FIELDS.forEach(f => { parsed[f.key] = (cols[f.idx] || '').trim(); });
+  const industry=D['行業']||'未填';
+  const name=D['姓名品牌'];
+  const title=D['職稱']||'';
+  const story=D['核心故事']||'';
+  const audience=D['目標客群']||'';
+  const style=D['品牌風格']||'';
+  const avoid=D['不想要']||'';
+  const cta=D['CTA目標']||'';
+  const plats=platforms();
+  const hasLocation=!!(D['地址']);
 
-    // 自動填入手動欄位
-    if (parsed['行業']) setVal('f_industry', parsed['行業']);
-    if (parsed['希望客戶做什麼']) setVal('f_cta_goal', parsed['希望客戶做什麼']);
-    if (parsed['姓名品牌']) document.getElementById('f_name').value = parsed['姓名品牌'];
-    if (parsed['職稱']) document.getElementById('f_title').value = parsed['職稱'];
-    if (parsed['核心故事']) document.getElementById('f_core_story').value = parsed['核心故事'];
-    if (parsed['目標客群']) document.getElementById('f_target_audience').value = parsed['目標客群'];
-    if (parsed['品牌風格']) setVal('f_style', parsed['品牌風格']);
-    if (parsed['不想要']) document.getElementById('f_avoid').value = parsed['不想要'];
-
-    const plats = [parsed['YouTube'], parsed['Facebook'], parsed['Instagram'], parsed['其他平台']].filter(Boolean).join('、');
-    if (plats) document.getElementById('f_platforms').value = plats;
-    if (parsed['地址']) document.getElementById('f_location').value = parsed['地址'] ? '有店面／工作室' : '線上為主';
-
-    // 顯示預覽
-    const grid = document.getElementById('previewGrid');
-    grid.innerHTML = FIELDS.slice(1, 10).map(f => {
-      const val = parsed[f.key];
-      return `<div class="preview-field"><div class="preview-key">${f.key}</div><div class="preview-val${val ? '' : ' empty'}">${val || '未填'}</div></div>`;
-    }).join('');
-    grid.classList.add('show');
-  }
-
-  function setVal(id, val) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    for (let i = 0; i < el.options.length; i++) {
-      if (el.options[i].value.includes(val) || val.includes(el.options[i].value)) {
-        el.selectedIndex = i; break;
-      }
-    }
-  }
-
-  function selectPlan(radio) {
-    document.querySelectorAll('.plan-opt').forEach(o => o.classList.remove('selected'));
-    radio.closest('.plan-opt').classList.add('selected');
-  }
-
-  function v(id) { const el = document.getElementById(id); return el ? el.value.trim() : ''; }
-  function radioVal(name) { const el = document.querySelector('input[name="' + name + '"]:checked'); return el ? el.value : ''; }
-
-  function getPlatforms() {
-    const p = v('f_platforms');
-    return p || '尚無平台';
-  }
-
-  function generate() {
-    const industry = v('f_industry');
-    const name = v('f_name');
-    const title = v('f_title');
-    const story = v('f_core_story');
-    const audience = v('f_target_audience');
-    const style = v('f_style');
-    const avoid = v('f_avoid');
-    const ctaGoal = v('f_cta_goal');
-    const location = v('f_location');
-    const platforms = getPlatforms();
-    const plan = radioVal('plan');
-
-    if (!name || !story || !audience) { alert('請至少填寫：姓名品牌名稱、核心故事、目標客群'); return; }
-    if (!plan) { alert('請選擇合作方案'); return; }
-
-    const clientInfo = `【客戶基本資料】
-行業：${industry || '未填'}
-姓名／品牌：${name}
-職稱：${title || '未填'}
+  const base=`【客戶資料】
+行業：${industry}
+姓名／品牌：${name}${title?'　職稱：'+title:''}
 核心故事：${story}
-目標客群與痛點：${audience}
-品牌風格：${style || '未填'}
-不想要的感覺：${avoid || '未填'}
-希望客戶做什麼：${ctaGoal || '未填'}
-實體據點：${location || '未填'}
-現有平台：${platforms}
+目標客群：${audience}
+品牌風格：${style}
+不想要的感覺：${avoid}
+希望客戶做什麼：${cta}
+現有平台：${plats}
+${hasLocation?'實體據點：'+D['地址']:'線上為主'}
 合作方案：${plan}`;
 
-    // ── 完整版指令 ──
-    const fullPrompt = buildFullPrompt(clientInfo, industry, plan, name, audience, ctaGoal, location, platforms);
-    const cardPrompt = buildCardPrompt(clientInfo);
-    const videoPrompt = buildVideoPrompt(clientInfo, industry, platforms);
-    const deliveryPrompt = buildDeliveryPrompt(clientInfo, plan, industry, name);
-    const timelinePrompt = buildTimelinePrompt(clientInfo, plan, industry);
+  // ── 完整版 ──
+  document.getElementById('o0').textContent=`你是資深品牌顧問，專精中小型個人品牌商業閉環建立。
+請根據以下客戶資料，產出一份完整、具體、可立即執行的品牌商業方案。
 
-    document.getElementById('out_full').textContent = fullPrompt;
-    document.getElementById('out_card').textContent = cardPrompt;
-    document.getElementById('out_video').textContent = videoPrompt;
-    document.getElementById('out_delivery').textContent = deliveryPrompt;
-    document.getElementById('out_timeline').textContent = timelinePrompt;
+品質標準：
+✦ 每句話都要具體可執行，不能有空話
+✦ 每個建議都要說明「為什麼」
+✦ 客戶看完要知道「我下一步做什麼」
+✦ 你看完要知道「我要交付什麼」
 
-    document.getElementById('resultArea').classList.add('show');
-    document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth' });
-  }
+${base}
 
-  function buildFullPrompt(info, industry, plan, name, audience, ctaGoal, location, platforms) {
-    return `你是「幸福天使品牌顧問」，請根據以下客戶資料，產出完整品牌分析與商業執行方案。
+═══════════════════════
+📊 一、行業機會分析
+═══════════════════════
+請分析：
+1. 這個行業（${industry}）目前最大的市場機會在哪裡？
+2. 目標客群（${audience}）的核心痛點是什麼？具體說明3個。
+3. 同行通常怎麼做？這個客戶的差異化機會在哪裡？
+4. ${hasLocation?'有實體據點的優勢如何發揮？Google地圖策略？':'線上經營的關鍵成功因素是什麼？'}
 
-${info}
+═══════════════════════
+🧬 二、品牌DNA
+═══════════════════════
+【說話的人】這個品牌用什麼視角說話？什麼樣的口吻？
+【情緒底色】客戶看完這個品牌應該有什麼感覺？
+【慣用語氣】具體描述說話方式（例：像朋友說話、像老師說話）
+【慣用意象】哪些畫面、物件、場景反覆出現？列出5個
+【禁止詞】哪些詞絕對不用？為什麼？列出5個
+【核心差異】一句話說清楚這個品牌和同行最不同的地方
 
-請依序完整產出以下所有內容：
+═══════════════════════
+📇 三、智慧名片建議
+═══════════════════════
+1. 品牌故事（100-150字，有溫度、真實感）
+2. 一句話理念 × 3版本（每個14字以內含標點，不能斷行）
+   版本1（溫暖型）：
+   版本2（專業型）：
+   版本3（行動型）：
+3. 跑馬燈內容（3-5條，用｜區隔，每條至少15字）
+4. 照片牆建議 × 5張（每張說明：拍什麼、為什麼能建立信任）
+5. CTA按鈕建議 × 3個（標題5-10字、連結類型、為什麼有效）
 
-═══════════════════════════
-📇 PART A｜智慧名片建議
-═══════════════════════════
+═══════════════════════
+🎬 四、影音策略
+═══════════════════════
+1. 主力平台（依現有：${plats}）
+   推薦平台＋原因＋發布頻率＋最佳時間
+2. 內容主題方向 × 3
+   每個含：標題、為什麼適合、具體內容示例
+3. Hook句庫 × 6個
+   痛點型 × 2、反差型 × 2、好奇型 × 2
+4. 第一支影音完整製作指令
+   （可直接給AI執行）
+   包含：影片類型、前3秒Hook、內容架構、結尾CTA
+5. AI產圖指令（ChatGPT DALL-E英文格式）
 
-1. 品牌故事（名片用）
-100-150字，有溫度、真實感，說明為什麼做這件事。
+═══════════════════════
+💼 五、商業閉環設計（${plan}方案）
+═══════════════════════
+根據行業特性設計具體閉環：
+→ 流量入口：如何讓目標客群找到他？（具體渠道）
+→ 信任建立：如何在30秒內讓人信任他？（具體方法）
+→ 成交路徑：從第一次接觸到付款，具體步驟？
+→ 回購機制：如何讓客戶持續回來？
+${hasLocation?'→ Google地圖策略：具體優化步驟？':''}
 
-2. 一句話理念 × 3版本
-每個14字以內（含標點），不能斷行，風格各異。
-版本1：
-版本2：
-版本3：
+═══════════════════════
+📋 六、客戶需準備的素材
+═══════════════════════
+【必備素材】（沒有這些無法開始）
+【建議準備】（有了效果更好）
+【可之後補充】（不急但重要）
 
-3. 跑馬燈內容
-3-5條，用｜區隔，每條至少15字，適合循環播放。
+═══════════════════════
+🎯 七、核心金句 × 3
+═══════════════════════
+適合放名片、社群、影音開場的金句。
+要有記憶點、有情感共鳴、說出客戶心聲。`;
 
-4. 照片牆內容建議
-列出5張照片的具體拍攝方向，說明為什麼這樣拍能建立信任。
-附ChatGPT DALL-E產圖指令（英文）。
+  // ── 名片建議 ──
+  document.getElementById('o1').textContent=`你是「幸福天使品牌顧問」，請根據以下資料，產出完整智慧名片填寫建議。
 
-5. CTA按鈕建議（依行業：${industry}）
-推薦3-5個CTA，每個包含：
-- 按鈕標題（5-10字）
-- 建議連結類型
-- 為什麼這個CTA適合這個行業
-
-═══════════════════════════
-🎬 PART B｜影音品牌DNA
-═══════════════════════════
-
-6. 品牌DNA文件
-【說話的人】用什麼視角、什麼身份說話
-【情緒底色】這個品牌給人什麼整體感覺
-【慣用語氣】白話／專業／溫暖／活潑等
-【禁止詞】哪些詞絕對不用，為什麼
-【慣用意象】哪些畫面、物件、場景反覆出現
-
-7. 建議主力平台（依現有：${platforms}）
-推薦1-2個，說明：
-- 為什麼這個平台最適合
-- 這個行業在這個平台的成功關鍵
-- 建議發布頻率和最佳時間
-
-8. 內容主題方向 × 3
-每個包含：主題標題＋為什麼適合＋具體內容方向示例
-
-9. 第一支影音製作指令
-可直接給AI執行，包含：
-影片類型、開頭Hook（前3秒）、主要內容架構、結尾CTA、適合平台
-
-10. AI產圖指令（ChatGPT DALL-E格式）
-針對這個品牌的影音封面圖，英文，包含風格、色調、構圖、人物、氛圍。
-
-═══════════════════════════
-💼 PART C｜商業執行方案（${plan}）
-═══════════════════════════
-
-11. 行業機會分析
-這個行業（${industry}）目前的市場機會在哪裡？
-目標客群（${audience}）的核心痛點是什麼？
-競爭對手通常怎麼做？這個客戶的差異化在哪裡？
-
-12. 商業閉環設計
-根據這個客戶的行業和目標（${ctaGoal}），設計一個具體的商業閉環：
-- 流量入口（如何讓人找到他）
-- 信任建立（如何讓人相信他）
-- 成交路徑（如何引導購買或預約）
-- 回購機制（如何讓客戶再回來）
-${location === '有店面／工作室' ? '- Google地圖策略（如何優化在地搜尋）' : ''}
-
-13. 客戶需要準備的素材清單
-具體列出這個行業需要準備的所有素材，分類說明：
-【必備素材】
-【建議準備】
-【可之後補充】
-
-14. 核心金句 × 3
-適合放在名片、社群、影音的品牌金句，有記憶點、有情感。`;
-  }
-
-  function buildCardPrompt(info) {
-    return `你是「幸福天使品牌顧問」，請根據以下客戶資料，產出完整的智慧名片填寫建議。
-
-${info}
+${base}
 
 請產出：
 
-1. 品牌故事（100-150字，有溫度真實感，適合名片）
+1. 品牌故事
+100-150字，有溫度、真實感，讓人讀完想認識這個人。
+寫完說明：這個故事哪裡最有感？為什麼？
 
-2. 一句話理念 × 3版本
-每個14字以內（含標點），不能斷行
-版本1（溫暖感）：
-版本2（專業感）：
-版本3（行動感）：
+2. 一句話理念 × 3版本（14字以內含標點，不能斷行）
+版本1（溫暖型）：
+版本2（專業型）：
+版本3（行動型）：
+每個版本說明為什麼這樣寫。
 
-3. 跑馬燈內容建議
-3-5條，用｜區隔，每條至少15字
-（包含：限時優惠型、社會認證型、活動公告型）
+3. 跑馬燈內容 × 5條
+用｜區隔，每條至少15字
+分類產出：限時優惠型、社會認證型、活動公告型、品牌理念型、導流型
 
 4. 照片牆建議 × 5張
-每張說明：拍什麼、怎麼拍、為什麼能建立信任
+每張說明：
+- 拍什麼（具體場景）
+- 怎麼拍（構圖、光線建議）
+- 為什麼能建立信任
 
-5. CTA按鈕建議 × 3-5個
-每個含：標題（5-10字）、連結類型、轉換理由
+5. CTA按鈕建議 × 5個
+每個含：
+- 按鈕標題（5-10字）
+- 連結類型（LINE／預約系統／問卷／網頁）
+- 放在第幾個位置
+- 為什麼這個CTA能有效轉換
 
-6. 服務項目文案
-幫客戶優化服務項目的描述方式，讓人看了有感`;
-  }
+6. 服務項目文案優化
+幫客戶把服務項目寫得更有感，讓人看了想了解更多。`;
 
-  function buildVideoPrompt(info, industry, platforms) {
-    return `你是「幸福天使品牌顧問」，請根據以下客戶資料，產出影音品牌DNA與完整製作建議。
+  // ── 影音DNA ──
+  document.getElementById('o2').textContent=`你是「幸福天使影音策略顧問」，請根據以下資料，產出完整影音品牌DNA與製作方案。
 
-${info}
+${base}
 
 請產出：
 
-1. 品牌DNA文件
-說話視角／情緒底色／慣用語氣／禁止詞／慣用意象
+1. 品牌DNA完整文件
+【說話的人】視角＋身份＋口吻
+【情緒底色】整體感受描述
+【慣用語氣】具體說話方式示例
+【慣用意象】5個反覆出現的畫面物件
+【禁止詞】5個絕對不用的詞，說明原因
+【核心差異】和同行最不同的一句話
 
-2. 平台策略（依現有：${platforms}）
-主力平台推薦＋理由＋發布頻率＋最佳時間
+2. 平台策略（依現有：${plats}）
+主力平台推薦：
+- 為什麼這個平台最適合（數據層面說明）
+- 這個行業在這個平台的成功關鍵
+- 建議發布頻率（幾天一次）
+- 最佳發布時間（具體時段）
+- 前3個月的成長目標
 
 3. 內容主題方向 × 3
-每個含：標題＋為什麼適合＋具體示例
+每個含：
+- 主題標題
+- 為什麼適合這個客群
+- 具體內容示例 × 3個
 
-4. Hook庫 × 6個
-針對這個行業（${industry}）的目標客群，提供6個強力開場句，分類：
-- 痛點型 × 2
-- 反差型 × 2
-- 好奇型 × 2
+4. Hook句庫 × 9個
+痛點型 × 3（讓人「這說的就是我！」）
+反差型 × 3（打破認知的開場）
+好奇型 × 3（讓人想繼續看）
 
 5. 第一支影音完整製作指令
-（可直接給ChatGPT或Claude執行）
-包含：影片類型、前3秒Hook、內容架構、結尾CTA、字幕建議
+（直接給ChatGPT或Claude執行）
+影片類型：
+片長建議：
+前3秒Hook：
+內容架構（列出每個段落）：
+結尾CTA：
+字幕風格：
+配樂方向：
+適合發布平台：
 
-6. AI產圖指令 × 2種
-- 封面圖指令（英文，DALL-E格式）
-- 圖文背景圖指令（英文，DALL-E格式）`;
-  }
+6. AI產圖指令 × 2
+封面圖：（英文，DALL-E格式，含風格色調構圖氛圍）
+品牌形象圖：（英文，DALL-E格式）`;
 
-  function buildDeliveryPrompt(info, plan, industry, name) {
-    const deliveryMap = {
-      '基礎': `【基礎方案｜指令包交付清單】
+  // ── 交付清單 ──
+  const deliveryContent = {
+    '名片建卡': `【名片建卡方案｜交付清單】
 
-你需要交付給客戶的內容：
-
-📦 交付項目
-□ 品牌DNA文件（1份）
+你需要交付的內容：
+□ 品牌故事（名片用，100-150字）
 □ 一句話理念 × 3版本（供客戶選擇）
 □ 跑馬燈內容建議（3條）
-□ CTA按鈕建議（3個）
-□ 第一支影音製作指令（可自行操作）
-□ AI產圖指令 × 2（ChatGPT格式）
-□ 建議平台＋發布頻率說明
-□ 素材準備清單（客戶需自備）
-□ 操作教學（1次，約1小時）
-
-📋 客戶需要自備的素材
-（依行業：${industry}）
-□ 個人照片或品牌LOGO
-□ 產品／服務照片 3-5張
-□ 品牌故事（或提供素材讓你代寫）
-□ LINE個人連結
-□ 現有社群帳號連結
-
-⚠️ 注意事項
-- 指令包教學後由客戶自行操作
-- 後續問題透過LINE文字諮詢
-- 不包含代替客戶執行任何操作`,
-
-      '中階': `【中階方案｜半代工交付清單】
-
-你需要交付給客戶的內容：
-
-📦 每月交付項目
-□ 圖文貼文文案 × 8-10篇
-□ 短影音腳本 × 4支
-□ 每篇文案對應的AI產圖指令
-□ 發布時間建議表
-□ Hashtag組合 × 每篇5組
-
-📦 首月額外交付
-□ 品牌DNA文件（完整版）
-□ 智慧名片內容建議（全套）
-□ 內容主題月曆（3個月）
-□ 平台設定建議
-
-📋 客戶需要自備的素材
-□ 個人照或品牌照 5-10張
-□ 產品／服務實拍照 10張以上
-□ 客戶見證截圖或文字 3-5則
-□ LINE連結、社群帳號
-□ 品牌故事素材
-
-🔄 協作方式
-- 每月月初確認當月主題方向
-- 文案產出後LINE傳給客戶審核
-- 一次修改機會，客戶自行發布`,
-
-      '全包': `【全包方案｜代操交付清單】
-
-你負責的完整服務項目：
-
-📦 內容產出
-□ 圖文貼文文案 × 12篇以上
-□ 短影音腳本 × 6-8支
-□ AI產圖指令執行＋圖片產出
-□ 排程發布（使用排程工具）
-
-📦 管理報告
-□ 每月數據報告（觸及、互動、成長）
-□ 下月內容方向建議
-□ 優化策略調整
-
-📦 首月建置
-□ 品牌DNA文件
-□ 智慧名片完整建卡
-□ 社群帳號優化（簡介、封面）
-□ 內容主題年曆
-
-📋 客戶需要配合的事項
-□ 首月素材提供（照片、影片、故事）
-□ 每月月初30分鐘確認會議
-□ 即時提供新品、活動、優惠資訊
-□ 客戶見證持續收集`,
-
-      '名片建卡': `【名片建卡方案｜交付清單】
-
-📦 交付項目
-□ 品牌故事（名片用，100-150字）
-□ 一句話理念 × 3版本
-□ 跑馬燈內容建議（3條）
-□ 照片牆拍攝建議（5張方向）
-□ CTA按鈕建議（3個）
+□ 照片牆拍攝方向建議（5張）
+□ CTA按鈕建議（3個，含連結類型）
 □ AI產圖指令（個人品牌形象圖）
 □ 名片建卡所需資料整理清單
 
-📋 客戶需要準備
-□ 個人照片（正面、清晰）
-□ 品牌LOGO（PNG透明背景）
+客戶需要準備：
+□ 個人照片（正面、清晰、建議純色背景）
+□ 品牌LOGO（PNG透明背景，若無可用AI生成）
 □ 聯繫方式（LINE、電話、Email）
-□ 服務項目文字
-□ 現有社群連結`
-    };
+□ 服務項目列表（3-5項）
+□ 現有社群連結
 
-    return `你是「幸福天使品牌顧問」，請根據以下客戶資料和合作方案，產出具體的交付說明。
+時間：收到素材後1個工作天完成建卡`,
 
-${info}
+    '基礎': `【基礎方案｜指令包＋教學交付清單】
 
-${deliveryMap[plan] || '請說明交付內容'}
+你需要交付的內容：
+□ 品牌DNA文件（1份，A4一頁）
+□ 智慧名片完整建議（故事、金句、跑馬燈、CTA）
+□ 建議主力平台＋發布策略說明
+□ 內容主題方向 × 3個月
+□ 影音製作指令（可自行操作）
+□ AI產圖指令 × 2（ChatGPT格式）
+□ 素材拍攝清單（依行業客製）
+□ 操作教學（1次，1-2小時，LINE視訊）
 
-請根據客戶的行業（${industry}）和品牌特性，補充：
+客戶需要準備：
+□ 個人照或品牌照 3-5張
+□ 產品／服務實拍照 5張以上
+□ 品牌故事素材（或口述讓你代寫）
+□ LINE連結、社群帳號
+□ 服務定價表（用於CTA設計）
 
-1. 這個行業特別需要準備的素材（具體說明）
-2. 預期成果（合理預期，不誇大）
-3. 注意事項（這個行業常見的問題）`;
-  }
+後續支援：
+- 問題透過LINE文字諮詢
+- 不包含代替客戶執行操作`,
 
-  function buildTimelinePrompt(info, plan, industry) {
-    const weeks = plan === '基礎' ? 2 : plan === '名片建卡' ? 1 : 4;
-    return `你是「幸福天使品牌顧問」，請根據以下客戶資料，產出具體可執行的時間軸。
+    '中階': `【中階方案｜半代工交付清單】
 
-${info}
+每月交付：
+□ 圖文貼文文案 × 8-10篇（含AI產圖指令）
+□ 短影音腳本 × 4支
+□ 發布時間建議表
+□ Hashtag組合（每篇5組）
 
-請產出${weeks}週執行時間軸：
+首月額外交付：
+□ 品牌DNA文件（完整版）
+□ 智慧名片完整建卡建議
+□ 內容主題月曆（3個月規劃）
+□ 社群帳號簡介優化文案
+□ 平台設定建議
 
-格式：
-【第X週】主題
-你需要做什麼：（具體動作）
+每月協作流程：
+① 月初確認當月主題（LINE 10分鐘）
+② 文案產出→LINE傳客戶審核（3個工作天內）
+③ 客戶一次修改機會
+④ 客戶自行發布
+
+客戶需要準備：
+□ 個人照片 10張以上
+□ 產品／服務實拍照 每月5張新照
+□ 客戶見證 3-5則（持續收集）
+□ 新品、活動、優惠資訊（即時提供）`,
+
+    '全包': `【全包代操方案｜完整服務清單】
+
+每月執行：
+□ 圖文貼文 × 12篇以上（含圖片產出＋排程發布）
+□ 短影音腳本 × 6-8支
+□ 社群帳號管理（回覆留言、互動）
+□ 月底數據報告（觸及、互動、成長趨勢）
+□ 下月策略調整建議
+
+首月建置：
+□ 品牌DNA文件
+□ 智慧名片完整建卡
+□ 社群帳號全面優化
+□ 內容主題年度規劃
+□ 發布排程系統建立
+
+客戶只需要：
+□ 首月提供品牌素材（照片、故事、服務資訊）
+□ 每月月初30分鐘確認會議
+□ 即時提供新品、活動、優惠資訊
+□ 持續收集客戶見證`
+  };
+
+  document.getElementById('o3').textContent=`你是「幸福天使品牌顧問」，請根據以下資料和交付清單，產出具體的執行說明。
+
+${base}
+
+${deliveryContent[plan]||''}
+
+請補充說明：
+1. 針對這個行業（${industry}），特別需要注意的素材準備細節
+2. 這個方案完成後，客戶合理可以期待什麼成果？（具體、不誇大）
+3. 這個行業常見的執行卡點是什麼？如何避免？`;
+
+  // ── 時間軸 ──
+  const weekMap={'名片建卡':1,'基礎':2,'中階':4,'全包':4};
+  const weeks=weekMap[plan]||2;
+  document.getElementById('o4').textContent=`你是「幸福天使品牌顧問」，請根據以下資料，產出具體可執行的${weeks}週時間軸。
+
+${base}
+
+格式要求：
+【第X週】主題標題
+你需要做：（每項具體動作，不能模糊）
 客戶需要配合：（具體動作）
-預期完成：（具體成果）
+本週完成：（具體交付成果）
+注意事項：（這週可能的卡點）
 
 要求：
-1. 每個動作要具體，不能模糊
-2. 說明你做什麼，客戶做什麼，分清楚責任
-3. 結尾說明${weeks}週後的預期狀態
-4. 根據行業（${industry}）的特性調整節奏`;
-  }
+1. 每個動作要具體，例如「拍5張個人品牌照」而不是「準備素材」
+2. 分清楚你做什麼、客戶做什麼
+3. 說明${weeks}週後客戶的狀態
+4. 根據行業（${industry}）特性調整節奏
+5. 如果遇到客戶拖延，備用方案是什麼？`;
 
-  function switchTab(idx, el) {
-    document.querySelectorAll('.rtab').forEach((t, i) => t.classList.toggle('active', i === idx));
-    document.querySelectorAll('.rtab-content').forEach((t, i) => t.classList.toggle('active', i === idx));
-  }
+  // ── LINE摘要（快速傳給客戶用）──
+  document.getElementById('o5').textContent=`你是「幸福天使品牌顧問」，請根據以下資料，產出一份可以直接貼到LINE傳給客戶的品牌方案摘要。
 
-  function copyOut(id, btn) {
-    navigator.clipboard.writeText(document.getElementById(id).textContent).then(() => {
-      btn.textContent = '✓ 已複製';
-      btn.classList.add('copied');
-      setTimeout(() => { btn.textContent = '複製'; btn.classList.remove('copied'); }, 2000);
-    });
-  }
+${base}
 
-  function copyAll() {
-    const full = document.getElementById('out_full').textContent;
-    navigator.clipboard.writeText(full).then(() => {
-      const btn = document.getElementById('copyAllBtn');
-      btn.textContent = '✓ 已複製';
-      btn.classList.add('copied');
-      setTimeout(() => { btn.textContent = '複製全部'; btn.classList.remove('copied'); }, 2000);
-    });
-  }
+格式要求：
+1. 不要長篇大論，重點就好
+2. 用換行和Emoji分段，手機看起來舒服
+3. 客戶看完要知道「我下一步要做什麼」
 
-  function clearAll() {
-    if (!confirm('確定清除所有填寫內容？')) return;
-    ['f_industry','f_cta_goal','f_name','f_title','f_core_story','f_target_audience',
-     'f_style','f_avoid','f_location','f_platforms'].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.value = '';
-    });
-    document.getElementById('pasteArea').value = '';
-    document.getElementById('previewGrid').classList.remove('show');
-    document.getElementById('previewGrid').innerHTML = '';
-    document.getElementById('resultArea').classList.remove('show');
-    document.querySelectorAll('.plan-opt').forEach(o => o.classList.remove('selected'));
-    document.querySelectorAll('input[name="plan"]').forEach(r => r.checked = false);
-    parsed = {};
-  }
+請產出：
 
-  document.addEventListener('change', function(e) {
-    if (e.target.type === 'radio' && e.target.name === 'plan') {
-      selectPlan(e.target);
-    }
+☀️ 品牌分析摘要（3-4行）
+
+📇 名片建議
+・一句話理念（最推薦的1個版本）
+・跑馬燈（最推薦的1條）
+・CTA建議（最重要的1個）
+
+🎬 影音建議
+・建議主力平台：
+・第一支影音方向：
+・最強Hook句：
+
+📋 你現在需要準備
+（列3-5個最重要的素材，具體說明）
+
+⏰ 下一步行動
+（告訴客戶接下來怎麼配合你）
+
+結尾加上：溫暖、專業、不推銷的一句話`;
+
+  document.getElementById('result').classList.add('show');
+  document.getElementById('result').scrollIntoView({behavior:'smooth'});
+}
+
+function sw(idx,el){
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('on',i===idx));
+  document.querySelectorAll('.tab-pane').forEach((t,i)=>t.classList.toggle('on',i===idx));
+}
+function cp(id,btn){
+  navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>{
+    btn.textContent='✓ 已複製'; btn.classList.add('done');
+    setTimeout(()=>{btn.textContent='複製';btn.classList.remove('done');},2000);
   });
+}
+function copyAll(){
+  navigator.clipboard.writeText(document.getElementById('o0').textContent).then(()=>{
+    const b=document.getElementById('caBtn');
+    b.textContent='✓ 已複製'; b.classList.add('done');
+    setTimeout(()=>{b.textContent='複製全部';b.classList.remove('done');},2000);
+  });
+}
+function clr(){
+  if(!confirm('確定清除？'))return;
+  document.getElementById('paste').value='';
+  document.getElementById('prev').classList.remove('show');
+  document.getElementById('prev').innerHTML='';
+  document.getElementById('result').classList.remove('show');
+  document.querySelectorAll('.plan-opt').forEach(o=>o.classList.remove('sel'));
+  document.querySelectorAll('input[name="plan"]').forEach(r=>r.checked=false);
+  D={};
+}
 </script>
 </body>
 </html>
