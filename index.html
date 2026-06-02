@@ -133,7 +133,16 @@
 
     <!-- 模式A -->
     <div class="mode-panel show" id="panelA">
-      <div class="step-label"><div class="step-num">2</div><div class="step-text">輸入客戶代碼或電話</div><div class="step-line"></div></div>
+
+      <!-- 診斷邀請：不需查詢，隨時可用 -->
+      <div class="step-label"><div class="step-num">2</div><div class="step-text">邀請客戶填診斷</div><div class="step-line"></div></div>
+      <div class="card" style="padding:14px;">
+        <div class="card-hint" style="margin-bottom:8px;">客戶還沒填診斷？直接複製邀請文案傳給他。</div>
+        <button class="flow-btn" style="width:100%;padding:13px;font-size:13px;" onclick="copyDiagInvite()">📨 複製診斷邀請文案<br><span style="font-weight:400;opacity:.6;font-size:11px;">含診斷表單連結，隨時可用</span></button>
+        <div class="flow-msg" id="flowMsgDiagInvite" style="margin-top:6px;"></div>
+      </div>
+
+      <div class="step-label"><div class="step-num">3</div><div class="step-text">輸入客戶代碼或電話</div><div class="step-line"></div></div>
       <div class="card">
         <div class="card-hint">客戶填完診斷後會看到查詢代碼，請他告訴你，或你看他螢幕。</div>
         <div class="query-row"><div class="query-field"><div class="query-label">查詢代碼（6碼）</div><input class="query-input" type="text" id="codeA" placeholder="例：8888A3" maxlength="8" style="text-transform:uppercase"></div><button class="query-btn" onclick="queryA('code')">查詢</button></div>
@@ -163,7 +172,7 @@
         </div>
       </div>
 
-      <div class="step-label"><div class="step-num">3</div><div class="step-text">產出診斷＋影音指令</div><div class="step-line"></div></div>
+      <div class="step-label"><div class="step-num">4</div><div class="step-text">產出診斷＋影音指令</div><div class="step-line"></div></div>
       <button class="gen-btn" onclick="genA()">產出綜合診斷指令 ✦</button>
       <button class="clr-btn" onclick="clrA()">清除重查</button>
       <div class="result" id="resultA">
@@ -333,6 +342,13 @@ function flowMsg(txt){
 
 function copyDiagInvite(){
   const name=DA['姓名']||DA['姓名品牌名稱']||'您';
+  // 顯示提示：優先用flowMsgA，若不存在用flowMsgDiagInvite
+  const showMsg=(txt)=>{
+    const m1=document.getElementById('flowMsgA');
+    const m2=document.getElementById('flowMsgDiagInvite');
+    if(m1&&m1.closest('.flow-box')&&m1.closest('.flow-box').style.display!=='none'){m1.textContent=txt;setTimeout(()=>{m1.textContent='';},2500);}
+    else if(m2){m2.textContent=txt;setTimeout(()=>{m2.textContent='';},2500);}
+  };
   const text=`━━━━━━━━━━━━━━━━
 ☀️ 幸福天使｜免費品牌診斷
 
@@ -351,7 +367,7 @@ ${DIAG_URL}
 填完後請將查詢代碼告知我
 我會盡快為您完成分析 ☀️
 ━━━━━━━━━━━━━━━━`;
-  navigator.clipboard.writeText(text).then(()=>flowMsg('✓ 診斷邀請已複製'));
+  navigator.clipboard.writeText(text).then(()=>showMsg('✓ 診斷邀請已複製'));
 }
 
 function copyDiagReport(){
