@@ -1327,3 +1327,1332 @@ document.addEventListener('change',e=>{
 </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>幸福天使｜品牌顧問後台</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --gold: #b8860b; --gold-light: #d4a017; --gold-bright: #f0c040;
+      --gold-pale: #fdf3d8; --gold-border: #e8d4a0;
+      --brown-dark: #2a1a06; --brown-mid: #5a3a14;
+      --dark: #1a1008; --dark-2: #251608; --dark-3: #2e1f0a;
+      --green: #06c755;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: "Noto Sans TC", sans-serif; background: var(--dark); color: #fff; min-height: 100vh; }
+
+    /* 鎖定 */
+    #lockScreen {
+      display: flex; position: fixed; inset: 0;
+      background: linear-gradient(160deg, var(--dark), var(--dark-3));
+      z-index: 9999; flex-direction: column;
+      align-items: center; justify-content: center; padding: 24px;
+    }
+    .lock-sun { font-size: 52px; margin-bottom: 12px; filter: drop-shadow(0 0 20px rgba(212,160,23,.9)); }
+    .lock-title { font-family: "Noto Serif TC", serif; font-size: 20px; font-weight: 900; color: #fff; margin-bottom: 4px; }
+    .lock-sub { font-size: 11px; color: rgba(255,255,255,.35); margin-bottom: 28px; letter-spacing: 2px; }
+    .lock-input { width: 100%; max-width: 260px; padding: 14px 18px; border: 1px solid rgba(184,134,11,.3); border-radius: 12px; font-size: 22px; text-align: center; background: rgba(255,255,255,.06); color: #fff; outline: none; letter-spacing: 8px; font-family: "Noto Sans TC", sans-serif; }
+    .lock-input:focus { border-color: var(--gold); }
+    .lock-btn { margin-top: 10px; width: 100%; max-width: 260px; padding: 14px; background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 900; font-family: "Noto Sans TC", sans-serif; cursor: pointer; }
+    .lock-err { color: rgba(255,100,100,.7); font-size: 12px; margin-top: 8px; min-height: 18px; }
+    #main { display: none; }
+
+    /* 頂部 */
+    .hdr { background: linear-gradient(135deg, var(--dark), var(--dark-3)); border-bottom: 1px solid rgba(184,134,11,.15); padding: 14px 20px; display: flex; align-items: center; gap: 10px; position: sticky; top: 0; z-index: 100; }
+    .hdr-sun { font-size: 26px; }
+    .hdr-title { font-family: "Noto Serif TC", serif; font-size: 15px; font-weight: 900; color: #fff; }
+    .hdr-sub { font-size: 10px; color: rgba(255,255,255,.35); margin-top: 1px; }
+    .hdr-badge { margin-left: auto; background: rgba(184,134,11,.15); border: 1px solid rgba(184,134,11,.25); color: var(--gold-bright); font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 999px; letter-spacing: 1px; }
+
+    .wrap { max-width: 680px; margin: 0 auto; padding: 16px 16px 80px; }
+
+    /* 模式切換 - 3個 */
+    .mode-switch { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+    .mode-btn { background: rgba(255,255,255,.05); border: 1.5px solid rgba(184,134,11,.15); border-radius: 14px; padding: 14px 10px; cursor: pointer; text-align: center; transition: all .2s; }
+    .mode-btn.active { background: rgba(184,134,11,.15); border-color: var(--gold); box-shadow: 0 0 0 1px rgba(184,134,11,.2); }
+    .mode-icon { font-size: 24px; margin-bottom: 5px; }
+    .mode-name { font-size: 12px; font-weight: 900; color: #fff; margin-bottom: 2px; }
+    .mode-desc { font-size: 10px; color: rgba(255,255,255,.4); line-height: 1.5; }
+    .mode-tag { display: inline-block; font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 999px; margin-top: 4px; }
+    .mode-tag.a { background: rgba(184,134,11,.2); color: var(--gold-bright); }
+    .mode-tag.b { background: rgba(47,111,94,.3); color: #6fcfb0; }
+    .mode-tag.c { background: rgba(100,50,150,.3); color: #c8a0f0; }
+
+    /* 步驟標籤 */
+    .step-label { display: flex; align-items: center; gap: 10px; margin: 16px 0 10px; }
+    .step-num { width: 28px; height: 28px; background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900; flex-shrink: 0; }
+    .step-text { font-size: 13px; font-weight: 700; color: rgba(255,255,255,.6); }
+    .step-line { flex: 1; height: 1px; background: rgba(184,134,11,.15); }
+
+    /* 卡片 */
+    .card { background: rgba(255,255,255,.05); border: 1px solid rgba(184,134,11,.12); border-radius: 16px; padding: 18px; margin-bottom: 10px; }
+    .card-hint { font-size: 12px; color: rgba(255,255,255,.35); line-height: 1.7; margin-bottom: 10px; }
+
+    /* 查詢區 */
+    .query-row { display: flex; gap: 8px; align-items: flex-end; }
+    .query-field { flex: 1; }
+    .query-label { font-size: 11px; font-weight: 700; color: rgba(255,255,255,.4); margin-bottom: 5px; letter-spacing: .5px; }
+    .query-input { width: 100%; padding: 12px 14px; background: rgba(255,255,255,.06); border: 1px solid rgba(184,134,11,.2); border-radius: 10px; color: #fff; font-size: 15px; font-family: "Noto Sans TC", sans-serif; outline: none; transition: border-color .2s; letter-spacing: 2px; }
+    .query-input:focus { border-color: var(--gold); }
+    .query-btn { padding: 12px 16px; background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #fff; border: none; border-radius: 10px; font-size: 13px; font-weight: 900; font-family: "Noto Sans TC", sans-serif; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+    .query-or { text-align: center; font-size: 11px; color: rgba(255,255,255,.2); margin: 8px 0; }
+    .query-status { font-size: 12px; margin-top: 8px; min-height: 16px; }
+    .query-status.ok { color: #6fcfb0; }
+    .query-status.err { color: rgba(255,100,100,.7); }
+
+    /* 預覽 */
+    .preview { display: none; margin-top: 12px; background: rgba(184,134,11,.07); border: 1px solid rgba(184,134,11,.18); border-radius: 10px; padding: 12px; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .preview.show { display: grid; }
+    .pf-key { font-size: 10px; font-weight: 700; color: var(--gold); margin-bottom: 2px; letter-spacing: .5px; }
+    .pf-val { font-size: 12px; color: rgba(255,255,255,.7); line-height: 1.5; word-break: break-all; }
+    .pf-val.empty { color: rgba(255,255,255,.2); font-style: italic; }
+
+    /* 手動貼上 */
+    textarea { width: 100%; padding: 12px 14px; background: rgba(255,255,255,.06); border: 1px solid rgba(184,134,11,.2); border-radius: 10px; color: #fff; font-size: 14px; font-family: "Noto Sans TC", sans-serif; outline: none; transition: border-color .2s; resize: vertical; min-height: 70px; line-height: 1.7; }
+    textarea:focus { border-color: var(--gold); }
+
+    /* 方案選擇 */
+    .plan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .plan-opt { background: rgba(255,255,255,.05); border: 1.5px solid rgba(184,134,11,.15); border-radius: 12px; padding: 14px 12px; cursor: pointer; transition: all .18s; text-align: center; }
+    .plan-opt input { display: none; }
+    .plan-opt.sel { background: rgba(184,134,11,.15); border-color: var(--gold); }
+    .plan-icon { font-size: 22px; margin-bottom: 6px; }
+    .plan-name { font-size: 13px; font-weight: 900; color: #fff; margin-bottom: 3px; }
+    .plan-desc { font-size: 11px; color: rgba(255,255,255,.4); line-height: 1.5; }
+
+    /* 按鈕 */
+    .gen-btn { display: block; width: 100%; padding: 16px; background: linear-gradient(135deg, var(--gold), var(--gold-light)); color: #fff; border: none; border-radius: 12px; font-size: 15px; font-weight: 900; font-family: "Noto Sans TC", sans-serif; cursor: pointer; margin-top: 14px; letter-spacing: .5px; box-shadow: 0 4px 16px rgba(184,134,11,.3); }
+    .clr-btn { display: block; width: 100%; padding: 11px; background: transparent; color: rgba(255,255,255,.35); border: 1px solid rgba(255,255,255,.08); border-radius: 12px; font-size: 13px; font-weight: 700; font-family: "Noto Sans TC", sans-serif; cursor: pointer; margin-top: 8px; }
+
+    /* 結果 */
+    .result { display: none; margin-top: 20px; }
+    .result.show { display: block; }
+    .result-hdr { background: linear-gradient(135deg, rgba(184,134,11,.2), rgba(212,160,23,.08)); border: 1px solid rgba(184,134,11,.3); border-radius: 14px 14px 0 0; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; }
+    .result-hdr-title { font-family: "Noto Serif TC", serif; font-size: 14px; font-weight: 900; color: #fff; }
+    .copy-all { background: var(--gold); color: #fff; border: none; border-radius: 999px; padding: 6px 14px; font-size: 11px; font-weight: 900; font-family: "Noto Sans TC", sans-serif; cursor: pointer; white-space: nowrap; }
+    .copy-all.done { background: #4caf50; }
+    .tabs { display: flex; overflow-x: auto; background: rgba(255,255,255,.03); border-left: 1px solid rgba(184,134,11,.2); border-right: 1px solid rgba(184,134,11,.2); }
+    .tab { flex-shrink: 0; padding: 10px 14px; font-size: 11px; font-weight: 700; color: rgba(255,255,255,.35); cursor: pointer; border: none; background: transparent; font-family: "Noto Sans TC", sans-serif; border-bottom: 2px solid transparent; transition: all .18s; white-space: nowrap; }
+    .tab.on { color: var(--gold-bright); border-bottom-color: var(--gold); }
+    .tab-pane { display: none; }
+    .tab-pane.on { display: block; }
+    .result-body { background: rgba(255,255,255,.03); border: 1px solid rgba(184,134,11,.15); border-top: none; border-radius: 0 0 14px 14px; padding: 16px; }
+    .out-text { font-size: 13px; line-height: 1.9; color: rgba(255,255,255,.8); white-space: pre-wrap; word-break: break-word; background: rgba(255,255,255,.04); border: 1px solid rgba(184,134,11,.12); border-radius: 10px; padding: 14px; max-height: 55vh; overflow-y: auto; }
+    .copy-btn { display: inline-flex; align-items: center; gap: 4px; background: rgba(184,134,11,.12); border: 1px solid rgba(184,134,11,.25); color: var(--gold-bright); border-radius: 999px; padding: 7px 14px; font-size: 11px; font-weight: 700; font-family: "Noto Sans TC", sans-serif; cursor: pointer; margin-top: 10px; }
+    .copy-btn.done { background: rgba(76,175,80,.15); border-color: #4caf50; color: #4caf50; }
+
+    /* 模式面板 */
+    .mode-panel { display: none; }
+    .mode-panel.show { display: block; }
+
+    /* 折疊備用 */
+    .fallback-toggle { font-size: 12px; color: rgba(255,255,255,.3); cursor: pointer; text-align: center; margin-top: 8px; padding: 6px; border: 1px solid rgba(255,255,255,.06); border-radius: 8px; }
+    .fallback-toggle:hover { color: rgba(255,255,255,.5); }
+    .fallback-area { display: none; margin-top: 8px; }
+    .fallback-area.show { display: block; }
+
+    @media (max-width: 400px) {
+      .plan-grid { grid-template-columns: 1fr; }
+      .preview.show { grid-template-columns: 1fr; }
+      .mode-switch { grid-template-columns: 1fr; }
+      .query-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="lockScreen">
+  <div class="lock-sun">☀️</div>
+  <div class="lock-title">幸福天使後台</div>
+  <div class="lock-sub">品牌顧問指令中心</div>
+  <input class="lock-input" type="password" id="pw" placeholder="密碼" onkeydown="if(event.key==='Enter')unlock()">
+  <button class="lock-btn" onclick="unlock()">進入</button>
+  <div class="lock-err" id="pwErr"></div>
+</div>
+
+<div id="main">
+  <div class="hdr">
+    <div class="hdr-sun">☀️</div>
+    <div>
+      <div class="hdr-title">幸福天使｜品牌顧問後台</div>
+      <div class="hdr-sub">AI 協作指令產出中心 v2.0</div>
+    </div>
+    <div class="hdr-badge">PRO</div>
+  </div>
+
+  <div class="wrap">
+
+    <!-- 模式切換 -->
+    <div class="step-label">
+      <div class="step-num">1</div>
+      <div class="step-text">選擇指令模式</div>
+      <div class="step-line"></div>
+    </div>
+
+    <div class="mode-switch">
+      <div class="mode-btn active" id="modeA" onclick="switchMode('A')">
+        <div class="mode-icon">🔍</div>
+        <div class="mode-name">綜合診斷</div>
+        <div class="mode-desc">診斷＋影音<br>一次產出</div>
+        <span class="mode-tag a">00_綜合診斷</span>
+      </div>
+      <div class="mode-btn" id="modeB" onclick="switchMode('B')">
+        <div class="mode-icon">🚀</div>
+        <div class="mode-name">品牌方案</div>
+        <div class="mode-desc">完整品牌DNA<br>名片+影音+閉環</div>
+        <span class="mode-tag b">03_品牌素材庫</span>
+      </div>
+      <div class="mode-btn" id="modeC" onclick="switchMode('C')">
+        <div class="mode-icon">📋</div>
+        <div class="mode-name">手動貼入</div>
+        <div class="mode-desc">從試算表<br>複製貼上</div>
+        <span class="mode-tag c">備用模式</span>
+      </div>
+    </div>
+
+    <!-- ════ 模式A｜綜合診斷 ════ -->
+    <div class="mode-panel show" id="panelA">
+
+      <div class="step-label">
+        <div class="step-num">2</div>
+        <div class="step-text">輸入客戶代碼或電話</div>
+        <div class="step-line"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-hint">客戶填完診斷後會看到查詢代碼，請他告訴你，或你看他螢幕。</div>
+
+        <div class="query-row">
+          <div class="query-field">
+            <div class="query-label">查詢代碼（6碼）</div>
+            <input class="query-input" type="text" id="codeA" placeholder="例：8888A3" maxlength="8" style="text-transform:uppercase">
+          </div>
+          <button class="query-btn" onclick="queryA('code')">查詢</button>
+        </div>
+
+        <div class="query-or">── 或用電話查詢 ──</div>
+
+        <div class="query-row">
+          <div class="query-field">
+            <div class="query-label">電話號碼（後4碼或完整）</div>
+            <input class="query-input" type="tel" id="phoneA" placeholder="例：5678 或 0912345678" style="letter-spacing:1px">
+          </div>
+          <button class="query-btn" onclick="queryA('phone')">查詢</button>
+        </div>
+
+        <div class="query-status" id="statusA"></div>
+        <div class="preview" id="prevA"></div>
+      </div>
+
+      <div class="step-label">
+        <div class="step-num">3</div>
+        <div class="step-text">產出診斷＋影音指令</div>
+        <div class="step-line"></div>
+      </div>
+      <button class="gen-btn" onclick="genA()">產出綜合診斷指令 ✦</button>
+      <button class="clr-btn" onclick="clrA()">清除重查</button>
+
+      <div class="result" id="resultA">
+        <div class="result-hdr">
+          <div class="result-hdr-title">🔍 綜合診斷指令已產出</div>
+          <button class="copy-all" id="caA" onclick="copyAllA()">複製全部</button>
+        </div>
+        <div class="tabs">
+          <button class="tab on" onclick="swA(0,this)">📋 完整指令</button>
+          <button class="tab" onclick="swA(1,this)">🎬 影音策略</button>
+          <button class="tab" onclick="swA(2,this)">💬 LINE摘要</button>
+        </div>
+        <div class="result-body">
+          <div class="tab-pane on" id="a0"><div class="out-text" id="oa0"></div><button class="copy-btn" onclick="cp('oa0',this)">複製</button></div>
+          <div class="tab-pane" id="a1"><div class="out-text" id="oa1"></div><button class="copy-btn" onclick="cp('oa1',this)">複製</button></div>
+          <div class="tab-pane" id="a2"><div class="out-text" id="oa2"></div><button class="copy-btn" onclick="cp('oa2',this)">複製</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ 模式B｜品牌方案 ════ -->
+    <div class="mode-panel" id="panelB">
+
+      <div class="step-label">
+        <div class="step-num">2</div>
+        <div class="step-text">輸入客戶代碼或電話</div>
+        <div class="step-line"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-hint">客戶填完素材後會看到素材代碼，請他告訴你。</div>
+
+        <div class="query-row">
+          <div class="query-field">
+            <div class="query-label">素材代碼（6碼）</div>
+            <input class="query-input" type="text" id="codeB" placeholder="例：8888B5" maxlength="8" style="text-transform:uppercase">
+          </div>
+          <button class="query-btn" onclick="queryB('code')">查詢</button>
+        </div>
+
+        <div class="query-or">── 或用電話查詢 ──</div>
+
+        <div class="query-row">
+          <div class="query-field">
+            <div class="query-label">電話號碼（後4碼或完整）</div>
+            <input class="query-input" type="tel" id="phoneB" placeholder="例：5678 或 0912345678" style="letter-spacing:1px">
+          </div>
+          <button class="query-btn" onclick="queryB('phone')">查詢</button>
+        </div>
+
+        <div class="query-status" id="statusB"></div>
+        <div class="preview" id="prevB"></div>
+      </div>
+
+      <div class="step-label">
+        <div class="step-num">3</div>
+        <div class="step-text">選擇合作方案</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="card">
+        <div class="plan-grid">
+          <label class="plan-opt" id="p1"><input type="radio" name="plan" value="名片建卡">
+            <div class="plan-icon">📇</div><div class="plan-name">名片建卡</div><div class="plan-desc">只做智慧名片</div>
+          </label>
+          <label class="plan-opt" id="p2"><input type="radio" name="plan" value="基礎">
+            <div class="plan-icon">💡</div><div class="plan-name">基礎方案</div><div class="plan-desc">指令包＋教學</div>
+          </label>
+          <label class="plan-opt" id="p3"><input type="radio" name="plan" value="中階">
+            <div class="plan-icon">📱</div><div class="plan-name">中階方案</div><div class="plan-desc">半代工產出</div>
+          </label>
+          <label class="plan-opt" id="p4"><input type="radio" name="plan" value="全包">
+            <div class="plan-icon">🚀</div><div class="plan-name">全包代操</div><div class="plan-desc">產出到發布</div>
+          </label>
+        </div>
+      </div>
+
+      <div class="step-label">
+        <div class="step-num">4</div>
+        <div class="step-text">產出品牌方案指令</div>
+        <div class="step-line"></div>
+      </div>
+      <button class="gen-btn" onclick="genB()">產出品牌方案指令 ✦</button>
+      <button class="clr-btn" onclick="clrB()">清除重查</button>
+
+      <div class="result" id="resultB">
+        <div class="result-hdr">
+          <div class="result-hdr-title">🚀 品牌方案指令已產出</div>
+          <button class="copy-all" id="caB" onclick="copyAllB()">複製全部</button>
+        </div>
+        <div class="tabs">
+          <button class="tab on" onclick="swB(0,this)">📋 完整版</button>
+          <button class="tab" onclick="swB(1,this)">📇 名片建議</button>
+          <button class="tab" onclick="swB(2,this)">🎬 影音DNA</button>
+          <button class="tab" onclick="swB(3,this)">🔄 商業閉環</button>
+          <button class="tab" onclick="swB(4,this)">📦 交付清單</button>
+          <button class="tab" onclick="swB(5,this)">📅 時間軸</button>
+          <button class="tab" onclick="swB(6,this)">💬 LINE摘要</button>
+        </div>
+        <div class="result-body">
+          <div class="tab-pane on" id="b0"><div class="out-text" id="ob0"></div><button class="copy-btn" onclick="cp('ob0',this)">複製</button></div>
+          <div class="tab-pane" id="b1"><div class="out-text" id="ob1"></div><button class="copy-btn" onclick="cp('ob1',this)">複製</button></div>
+          <div class="tab-pane" id="b2"><div class="out-text" id="ob2"></div><button class="copy-btn" onclick="cp('ob2',this)">複製</button></div>
+          <div class="tab-pane" id="b3"><div class="out-text" id="ob3"></div><button class="copy-btn" onclick="cp('ob3',this)">複製</button></div>
+          <div class="tab-pane" id="b4"><div class="out-text" id="ob4"></div><button class="copy-btn" onclick="cp('ob4',this)">複製</button></div>
+          <div class="tab-pane" id="b5"><div class="out-text" id="ob5"></div><button class="copy-btn" onclick="cp('ob5',this)">複製</button></div>
+          <div class="tab-pane" id="b6"><div class="out-text" id="ob6"></div><button class="copy-btn" onclick="cp('ob6',this)">複製</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════ 模式C｜手動貼入備用 ════ -->
+    <div class="mode-panel" id="panelC">
+      <div class="step-label">
+        <div class="step-num">2</div>
+        <div class="step-text">選擇資料來源</div>
+        <div class="step-line"></div>
+      </div>
+
+      <div class="mode-switch" style="grid-template-columns:1fr 1fr;margin-bottom:10px;">
+        <div class="mode-btn active" id="cSrcA" onclick="switchCSrc('diag')">
+          <div class="mode-icon">🔍</div>
+          <div class="mode-name">00_綜合診斷</div>
+          <div class="mode-desc">產出診斷報告</div>
+        </div>
+        <div class="mode-btn" id="cSrcB" onclick="switchCSrc('mat')">
+          <div class="mode-icon">🚀</div>
+          <div class="mode-name">03_品牌素材庫</div>
+          <div class="mode-desc">產出品牌方案</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hint" id="cHint">開試算表 00_綜合診斷 → 選客戶整行（點行號）→ 複製 → 貼在這裡</div>
+        <textarea id="pasteC" rows="3" placeholder="貼上整行資料…" oninput="parseC()"></textarea>
+        <div class="preview" id="prevC"></div>
+      </div>
+
+      <button class="gen-btn" onclick="genC()">產出指令 ✦</button>
+      <button class="clr-btn" onclick="clrC()">清除重填</button>
+
+      <div class="result" id="resultC">
+        <div class="result-hdr">
+          <div class="result-hdr-title" id="resultCTitle">📋 指令已產出</div>
+          <button class="copy-all" id="caC" onclick="copyAllC()">複製全部</button>
+        </div>
+        <div class="tabs" id="resultCTabs"></div>
+        <div class="result-body" id="resultCBody"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const GAS = 'https://script.google.com/macros/s/AKfycbxpxXKX-rE3VfqYiRqjoDGtruYI0Q1CjOk3jGyBCcAwMR0Erf__TmL5snJikX3KMDYZ/exec';
+const PW = '167777', SK = 'angel_pro_v2';
+
+// 解鎖
+(()=>{ if(sessionStorage.getItem(SK)===PW){ document.getElementById('lockScreen').style.display='none'; document.getElementById('main').style.display='block'; } })();
+function unlock(){ if(document.getElementById('pw').value===PW){ sessionStorage.setItem(SK,PW); document.getElementById('lockScreen').style.display='none'; document.getElementById('main').style.display='block'; } else { document.getElementById('pwErr').textContent='密碼錯誤'; document.getElementById('pw').value=''; } }
+
+// 模式切換
+let curMode = 'A';
+function switchMode(m) {
+  curMode = m;
+  ['A','B','C'].forEach(x => {
+    document.getElementById('mode'+x).classList.toggle('active', x===m);
+    document.getElementById('panel'+x).classList.toggle('show', x===m);
+  });
+}
+
+// 資料存放
+let DA = {}, DB = {};
+
+// ─── 模式A｜查詢 ───
+async function queryA(type) {
+  const status = document.getElementById('statusA');
+  status.textContent = '查詢中…';
+  status.className = 'query-status';
+
+  const val = type === 'code'
+    ? document.getElementById('codeA').value.trim().toUpperCase()
+    : document.getElementById('phoneA').value.trim();
+
+  if (!val) { status.textContent = '請輸入' + (type==='code'?'代碼':'電話'); status.className='query-status err'; return; }
+
+  try {
+    const body = type === 'code'
+      ? { action: 'queryByCode', payload: { code: val, sheet: 'diag' } }
+      : { action: 'queryByPhone', payload: { phone: val, sheet: 'diag' } };
+
+    const res = await fetch(GAS, { method: 'POST', body: JSON.stringify(body) });
+    const data = await res.json();
+
+    if (data.ok && data.row) {
+      DA = data.row;
+      status.textContent = '✓ 找到：' + (DA['姓名']||DA['姓名品牌名稱']||'客戶');
+      status.className = 'query-status ok';
+      renderPreviewA();
+    } else {
+      status.textContent = '找不到資料，' + (data.message||'請確認代碼或電話');
+      status.className = 'query-status err';
+      DA = {};
+      document.getElementById('prevA').classList.remove('show');
+    }
+  } catch(e) {
+    status.textContent = '查詢失敗，請檢查網路連線';
+    status.className = 'query-status err';
+  }
+}
+
+function renderPreviewA() {
+  const fields = ['姓名','電話','產業類型','卡點','希望客戶做什麼','賣產品或服務','願意露臉','每週時間'];
+  const el = document.getElementById('prevA');
+  el.innerHTML = fields.map(k => {
+    const v = DA[k]||'';
+    return `<div><div class="pf-key">${k}</div><div class="pf-val${v?'':' empty'}">${v||'未填'}</div></div>`;
+  }).join('');
+  el.classList.add('show');
+}
+
+// ─── 模式B｜查詢 ───
+async function queryB(type) {
+  const status = document.getElementById('statusB');
+  status.textContent = '查詢中…';
+  status.className = 'query-status';
+
+  const val = type === 'code'
+    ? document.getElementById('codeB').value.trim().toUpperCase()
+    : document.getElementById('phoneB').value.trim();
+
+  if (!val) { status.textContent = '請輸入' + (type==='code'?'代碼':'電話'); status.className='query-status err'; return; }
+
+  try {
+    const body = type === 'code'
+      ? { action: 'queryByCode', payload: { code: val, sheet: 'material' } }
+      : { action: 'queryByPhone', payload: { phone: val, sheet: 'material' } };
+
+    const res = await fetch(GAS, { method: 'POST', body: JSON.stringify(body) });
+    const data = await res.json();
+
+    if (data.ok && data.row) {
+      DB = data.row;
+      status.textContent = '✓ 找到：' + (DB['姓名品牌名稱']||'客戶');
+      status.className = 'query-status ok';
+      renderPreviewB();
+    } else {
+      status.textContent = '找不到資料，' + (data.message||'請確認代碼或電話');
+      status.className = 'query-status err';
+      DB = {};
+      document.getElementById('prevB').classList.remove('show');
+    }
+  } catch(e) {
+    status.textContent = '查詢失敗，請檢查網路連線';
+    status.className = 'query-status err';
+  }
+}
+
+function renderPreviewB() {
+  const fields = ['姓名品牌名稱','電話','行業類型','核心故事','目標客群痛點','品牌風格','LINE官方'];
+  const el = document.getElementById('prevB');
+  el.innerHTML = fields.map(k => {
+    const v = DB[k]||'';
+    return `<div><div class="pf-key">${k}</div><div class="pf-val${v?'':' empty'}">${v||'未填'}</div></div>`;
+  }).join('');
+  el.classList.add('show');
+}
+
+// ─── 模式C｜手動貼入 ───
+let cSrc = 'diag';
+const COLS_DIAG = [
+  {k:'送出時間',i:0},{k:'查詢代碼',i:1},{k:'姓名',i:2},{k:'電話',i:3},{k:'Email',i:4},
+  {k:'LINE ID',i:5},{k:'品牌店名',i:6},{k:'產業類型',i:7},
+  {k:'卡點',i:8},{k:'希望客戶做什麼',i:9},{k:'已有素材',i:10},
+  {k:'發展方向',i:11},{k:'經營理念',i:12},{k:'目標客群',i:13},
+  {k:'核心故事',i:14},{k:'品牌風格',i:15},
+  {k:'賣產品或服務',i:16},{k:'客戶類型',i:17},{k:'現有平台',i:18},
+  {k:'願意露臉',i:19},{k:'每週時間',i:20},{k:'預算範圍',i:21},{k:'有無實體據點',i:22}
+];
+const COLS_MAT = [
+  {k:'送出時間',i:0},{k:'查詢代碼',i:1},{k:'行業類型',i:2},{k:'希望客戶做什麼',i:3},
+  {k:'姓名品牌名稱',i:4},{k:'職稱副標',i:5},{k:'單位公司',i:6},
+  {k:'核心故事',i:7},{k:'目標客群痛點',i:8},{k:'品牌風格',i:9},{k:'不想要的感覺',i:10},
+  {k:'電話',i:11},{k:'Email',i:12},{k:'LINE個人',i:13},{k:'LINE官方',i:14},{k:'地址',i:15},
+  {k:'YouTube',i:16},{k:'Facebook',i:17},{k:'Instagram',i:18},{k:'其他平台',i:19}
+];
+let DC = {};
+
+function switchCSrc(src) {
+  cSrc = src;
+  document.getElementById('cSrcA').classList.toggle('active', src==='diag');
+  document.getElementById('cSrcB').classList.toggle('active', src==='mat');
+  document.getElementById('cHint').textContent = src === 'diag'
+    ? '開試算表 00_綜合診斷 → 選客戶整行（點行號）→ 複製 → 貼在這裡'
+    : '開試算表 03_品牌素材庫 → 選客戶整行（點行號）→ 複製 → 貼在這裡';
+  document.getElementById('pasteC').value = '';
+  document.getElementById('prevC').classList.remove('show');
+  DC = {};
+}
+
+function parseC() {
+  const raw = document.getElementById('pasteC').value.trim();
+  if (!raw) { document.getElementById('prevC').classList.remove('show'); return; }
+  const cols = cSrc === 'diag' ? COLS_DIAG : COLS_MAT;
+  const c = raw.split('\t');
+  DC = {};
+  cols.forEach(f => { DC[f.k] = (c[f.i]||'').trim(); });
+  const previewFields = cols.slice(2, 10);
+  const el = document.getElementById('prevC');
+  el.innerHTML = previewFields.map(f => {
+    const v = DC[f.k]||'';
+    return `<div><div class="pf-key">${f.k}</div><div class="pf-val${v?'':' empty'}">${v||'未填'}</div></div>`;
+  }).join('');
+  el.classList.add('show');
+}
+
+function genC() {
+  if (cSrc === 'diag') {
+    if (!DC['姓名']) { alert('請先貼上診斷資料'); return; }
+    DA = DC;
+    genA();
+    switchMode('A');
+  } else {
+    if (!DC['姓名品牌名稱']) { alert('請先貼上素材資料'); return; }
+    DB = DC;
+    const plan = planVal();
+    if (!plan) { alert('請切換到品牌方案模式選擇方案'); return; }
+    genB();
+    switchMode('B');
+  }
+}
+
+function clrC() {
+  document.getElementById('pasteC').value = '';
+  document.getElementById('prevC').classList.remove('show');
+  document.getElementById('resultC').classList.remove('show');
+  DC = {};
+}
+
+function copyAllC() {
+  const texts = Array.from(document.querySelectorAll('#resultCBody .out-text')).map(el => el.textContent).join('\n\n═══════════════\n\n');
+  navigator.clipboard.writeText(texts).then(() => {
+    const b = document.getElementById('caC');
+    b.textContent = '✓';
+    b.classList.add('done');
+    setTimeout(() => { b.textContent = '複製全部'; b.classList.remove('done'); }, 2000);
+  });
+}
+
+// ════════════════════════════
+// 產出A｜綜合診斷指令
+// ════════════════════════════
+function genA() {
+  if (!DA['姓名'] && !DA['姓名品牌名稱']) { alert('請先查詢客戶資料'); return; }
+
+  const name = DA['姓名'] || DA['姓名品牌名稱'] || '';
+  const brand = DA['品牌店名'] || '';
+  const industry = DA['產業類型'] || DA['行業類型'] || '';
+  const pains = DA['卡點'] || '';
+  const cta = DA['希望客戶做什麼'] || '';
+  const materials = DA['已有素材'] || '';
+  const audience = DA['目標客群'] || DA['目標客群痛點'] || '';
+  const story = DA['核心故事'] || '';
+  const style = DA['品牌風格'] || '';
+  const sellType = DA['賣產品或服務'] || '';
+  const customerType = DA['客戶類型'] || '';
+  const platforms = DA['現有平台'] || '尚無平台';
+  const face = DA['願意露臉'] || '';
+  const timePerWeek = DA['每週時間'] || '';
+  const budget = DA['預算範圍'] || '';
+  const location = DA['有無實體據點'] || '';
+  const hasLocation = location.includes('店面') || location.includes('工作室');
+
+  const base = `【客戶資料】
+姓名：${name}${brand?' ／ '+brand:''}
+行業：${industry}
+目前卡點：${pains}
+希望客戶做什麼：${cta}
+已有素材：${materials}
+目標客群：${audience}
+核心故事：${story}
+品牌風格偏好：${style}
+賣：${sellType}｜客戶類型：${customerType}
+現有平台：${platforms}
+露臉意願：${face}｜每週時間：${timePerWeek}｜預算：${budget}
+${hasLocation?'有實體據點':'線上為主'}`;
+
+  // ── Tab 0｜完整診斷+影音指令 ──
+  document.getElementById('oa0').textContent =
+`你是「幸福天使品牌顧問」，具備品牌定位、商業閉環設計、影音策略三項專長。
+請根據以下客戶資料，產出一份完整的初步診斷報告，包含品牌卡點分析和影音策略建議。
+
+品質標準：
+✦ 說人話，不說空話，每句都要具體
+✦ 讓客戶看完感覺「你真的懂我」
+✦ 每個建議說明「為什麼」，不只告訴他做什麼
+✦ 結尾給出明確的下一步行動
+
+${base}
+
+═══════════════════════
+🔍 一、品牌卡點深度分析
+═══════════════════════
+根據客戶的卡點「${pains}」：
+
+1. 根本原因分析
+   這些卡點的底層問題是什麼？（不是表面症狀）
+   為什麼「${industry}」這個行業特別容易卡在這裡？
+
+2. 緊迫性
+   如果不解決，3個月後會發生什麼？
+   解決之後，最快可以看到什麼改變？
+
+3. 突破口
+   最快、最有效的第一步是什麼？
+   為什麼是這一步，而不是其他的？
+
+4. 資源盤點
+   客戶已有的「${materials}」，哪些被低估了？
+   現有資源如何快速轉化為競爭優勢？
+
+═══════════════════════
+🎯 二、針對性品牌建議
+═══════════════════════
+根據目標客群「${audience}」和希望客戶做的行動「${cta}」：
+
+1. 品牌定位建議
+   這個客戶最應該主打什麼差異化？
+   一句話說清楚他和同行最不一樣的地方。
+
+2. 智慧名片如何解決卡點
+   具體說明名片在「${industry}」行業的場景應用
+   哪3個名片功能對他最重要？為什麼？
+
+3. 本月可以做的3件事
+   每件事都要具體、可執行、說明預期效果
+
+═══════════════════════
+🎬 三、影音策略建議
+═══════════════════════
+根據客戶條件：
+・賣：${sellType}
+・目標客群：${customerType}
+・現有平台：${platforms}
+・露臉意願：${face}
+・每週可投入：${timePerWeek}
+・預算：${budget}
+
+1. 平台推薦
+   最適合這個客戶的平台是哪個？為什麼？
+   如何利用現有平台「${platforms}」做延伸？
+
+2. 內容策略
+   考慮露臉意願「${face}」，推薦什麼類型的影音格式？
+   每週「${timePerWeek}」能做什麼？給出具體的內容節奏。
+
+3. 第一支影音
+   主題建議（讓他知道拍什麼）
+   前3秒Hook句（讓人停下來看）
+   60秒內容架構
+   結尾CTA
+
+4. 快速起步方案
+   考慮預算「${budget}」，最低成本啟動的方法是什麼？
+   哪些工具可以免費用？
+
+═══════════════════════
+🌟 四、品牌潛力與長期方向
+═══════════════════════
+根據核心故事「${story}」和品牌風格「${style}」：
+
+1. 這個客戶的品牌DNA核心是什麼？
+2. 長期來看，他最有潛力發展的方向是哪裡？
+3. 一句話說出他最獨特的品牌價值（可以直接用來介紹自己）
+
+═══════════════════════
+📋 五、行動清單
+═══════════════════════
+【本週就做｜3件事】
+（每件具體到可以今天開始）
+
+【這個月完成｜3件事】
+（有明確產出的事項）
+
+【有餘力再做｜3件事】
+（重要但不緊急）
+
+語氣溫暖鼓勵，讓客戶感覺「我做得到，而且我現在就想開始」。`;
+
+  // ── Tab 1｜影音策略專版 ──
+  document.getElementById('oa1').textContent =
+`你是「幸福天使影音策略顧問」，請根據以下客戶資料，產出一份專業的影音策略建議。
+
+${base}
+
+請產出：
+
+═══════════════════════
+📊 一、客戶影音潛力評估
+═══════════════════════
+根據以下條件誠實評估：
+・露臉意願：${face}
+・每週時間：${timePerWeek}
+・預算：${budget}
+・現有平台：${platforms}
+・賣：${sellType}
+
+1. 這個客戶的影音優勢在哪裡？
+2. 最大的挑戰和限制是什麼？
+3. 合理期待：3個月後可以達到什麼？
+
+═══════════════════════
+🎯 二、平台策略
+═══════════════════════
+【主力平台推薦】
+平台名稱：
+推薦原因：（具體說明為什麼適合這個客戶）
+成功關鍵：（這個平台最重要的3個成功要素）
+發布頻率：（根據每週${timePerWeek}的時間規劃）
+最佳發布時間：
+前3個月目標：（具體數字，誠實不誇大）
+
+【輔助平台】（有餘力再做）
+平台：
+用途：
+最低投入：
+
+═══════════════════════
+🎬 三、內容策略
+═══════════════════════
+【內容類型推薦】
+考慮露臉意願「${face}」，推薦：
+・主要格式：（說明原因）
+・備選格式：（當主要格式做不到時）
+
+【內容主題方向 × 3】
+主題1：
+・標題：
+・為什麼適合：
+・具體示例×3：
+
+主題2：
+・標題：
+・為什麼適合：
+・具體示例×3：
+
+主題3：
+・標題：
+・為什麼適合：
+・具體示例×3：
+
+【Hook句庫 × 6】
+痛點型×2：
+反差型×2：
+好奇型×2：
+
+═══════════════════════
+🎥 四、第一支影音完整製作指令
+═══════════════════════
+影片主題：
+影片類型：
+建議片長：
+拍攝設備：（考慮預算「${budget}」）
+
+【前3秒Hook】
+（讓人停下來看的開場）
+
+【影片架構】
+0:00-0:10 開場
+0:10-0:40 主體內容
+0:40-0:55 核心價值
+0:55-1:00 CTA
+
+【結尾CTA】
+說什麼：
+引導到哪裡：
+
+【後製建議】
+字幕：
+配樂：
+封面圖設計建議：
+
+═══════════════════════
+🖼 五、AI產圖指令
+═══════════════════════
+【封面圖指令（英文，DALL-E格式）】
+（根據品牌風格「${style}」設計）
+
+【品牌形象圖指令（英文，DALL-E格式）】
+
+═══════════════════════
+📅 六、30天啟動計劃
+═══════════════════════
+第1週：（準備）
+第2週：（拍攝）
+第3週：（發布）
+第4週：（優化）
+
+每週具體任務，分清楚「你做」和「AI幫你做」。`;
+
+  // ── Tab 2｜LINE摘要 ──
+  document.getElementById('oa2').textContent =
+`你是「幸福天使品牌顧問」，請根據以下資料，產出可以直接貼到LINE傳給客戶的診斷摘要。
+
+${base}
+
+格式要求：
+1. 手機看起來舒服，用換行和Emoji分段
+2. 不超過25行，說重點
+3. 客戶看完要有「這真的說到我心裡了」的感覺
+4. 結尾告訴客戶下一步
+
+請產出：
+
+開頭：稱呼「${name}」，一句溫暖有力的開場
+
+☀️ 你的品牌卡點
+（2-3行，說出根本問題，不是表面症狀）
+
+💪 你已有的優勢
+（2行，讓客戶看到自己被低估的資源）
+
+🎯 最優先的一件事
+（1行，具體說出現在最該做什麼）
+
+🎬 影音方向建議
+（2行，根據露臉意願「${face}」和時間「${timePerWeek}」給具體建議）
+
+📋 本週行動清單
+① 
+② 
+③ 
+
+結尾：溫暖有力，讓客戶想繼續和你合作的一句話`;
+
+  document.getElementById('resultA').classList.add('show');
+  document.getElementById('resultA').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ════════════════════════════
+// 產出B｜品牌方案指令
+// ════════════════════════════
+function genB() {
+  if (!DB['姓名品牌名稱'] && !DB['姓名']) { alert('請先查詢客戶素材資料'); return; }
+  const plan = planVal();
+  if (!plan) { alert('請選擇合作方案'); return; }
+
+  const name = DB['姓名品牌名稱'] || DB['姓名'] || '';
+  const industry = DB['行業類型'] || '';
+  const cta = DB['希望客戶做什麼'] || '';
+  const story = DB['核心故事'] || '';
+  const audience = DB['目標客群痛點'] || '';
+  const style = DB['品牌風格'] || '';
+  const avoid = DB['不想要的感覺'] || '';
+  const title = DB['職稱副標'] || '';
+  const address = DB['地址'] || '';
+  const hasLocation = !!address;
+  const platforms = [DB['YouTube'],DB['Facebook'],DB['Instagram'],DB['其他平台']].filter(Boolean).join('、') || '尚無平台';
+
+  const base = `【客戶品牌資料】
+行業：${industry}
+姓名／品牌：${name}${title?' ／ '+title:''}
+核心故事：${story}
+目標客群：${audience}
+品牌風格：${style}
+不想要的感覺：${avoid}
+希望客戶做什麼：${cta}
+現有平台：${platforms}
+${hasLocation?'實體據點：'+address:'線上為主'}
+合作方案：${plan}`;
+
+  // ── Tab 0｜完整版 ──
+  document.getElementById('ob0').textContent =
+`你是資深品牌顧問，專精中小型個人品牌商業閉環建立。
+請根據以下客戶資料，產出一份完整、具體、可立即執行的品牌商業方案。
+
+品質標準：
+✦ 每句話都要具體可執行，不能有空話
+✦ 每個建議都要說明「為什麼」
+✦ 客戶看完要知道「我下一步做什麼」
+✦ 數字要誠實，不誇大承諾
+
+${base}
+
+═══════════════════════
+📊 一、行業機會分析
+═══════════════════════
+1. 「${industry}」目前最大的市場機會在哪裡？
+2. 目標客群「${audience}」的核心痛點？具體說3個。
+3. 同行通常怎麼做？這個客戶的差異化機會在哪裡？
+${hasLocation?'4. 實體據點的優勢如何發揮？Google地圖策略是什麼？':'4. 純線上經營的關鍵成功因素？'}
+
+═══════════════════════
+🧬 二、品牌DNA
+═══════════════════════
+【說話的人】這個品牌用什麼視角和口吻說話？
+【情緒底色】客戶看完這個品牌應該有什麼感覺？
+【慣用語氣】具體描述說話方式（舉例3句）
+【慣用意象】哪些畫面、物件、場景反覆出現？列5個
+【禁止詞】哪些詞絕對不用？為什麼？列5個
+【核心差異】一句話說清楚這個品牌和同行最不同的地方
+
+═══════════════════════
+📇 三、智慧名片建議
+═══════════════════════
+1. 品牌故事（120字左右，有溫度、真實感、第一人稱）
+   寫完說明：哪裡最有感？為什麼？
+
+2. 一句話理念 × 3版本（14字以內含標點，不能斷行）
+   版本1（溫暖型）：「」
+   版本2（專業型）：「」
+   版本3（行動型）：「」
+   每個版本說明為什麼這樣寫。
+
+3. 跑馬燈內容 × 5條（每條15字以上，用｜區隔）
+   限時優惠型：
+   社會認證型：
+   活動公告型：
+   品牌理念型：
+   導流型：
+
+4. 照片牆建議 × 5張
+   每張：主題｜拍攝重點｜為什麼能建立信任
+
+5. CTA按鈕建議 × 5個
+   每個：標題（5-10字）｜連結類型｜放第幾個｜為什麼有效
+
+═══════════════════════
+🔄 四、商業閉環設計
+═══════════════════════
+【被看見】流量入口在哪裡？3個具體渠道＋操作方法
+【被記住】10秒內讓人記住的品牌記憶點是什麼？
+【被信任】信任建立路徑＋最有力的信任素材
+【被成交】從看到名片到付款的完整流程（文字版）
+【被分享】轉介紹機制設計（自然、不推銷）
+【回購循環】長期客戶關係維繫的3個關鍵動作
+
+═══════════════════════
+🎬 五、影音策略
+═══════════════════════
+1. 主力平台推薦（根據現有：${platforms}）
+   平台、原因、發布頻率、最佳時間
+
+2. 內容主題方向 × 3
+   標題、為什麼適合、具體示例
+
+3. Hook句庫 × 6（痛點型×2、反差型×2、好奇型×2）
+
+4. 第一支影音完整製作指令
+
+5. AI產圖指令（英文，DALL-E格式）
+
+═══════════════════════
+📋 六、素材準備清單
+═══════════════════════
+【必備素材】沒有這些無法開始：
+【建議準備】有了效果更好：
+【之後補充】重要但不急：
+
+═══════════════════════
+🎯 七、核心金句 × 3
+═══════════════════════
+適合放名片、社群、影音開場。
+要有記憶點、情感共鳴、說出客戶心聲。`;
+
+  // ── Tab 1｜名片建議 ──
+  document.getElementById('ob1').textContent =
+`你是「幸福天使品牌顧問」，請根據以下資料，產出完整智慧名片填寫建議。
+
+${base}
+
+請產出：
+
+1. 品牌故事（120字，有溫度、真實感、第一人稱）
+   寫完說明：這個故事哪裡最有感？為什麼？
+
+2. 一句話理念 × 3版本（14字以內含標點，不能斷行）
+   版本1（溫暖型）：「」
+   版本2（專業型）：「」
+   版本3（行動型）：「」
+   每個版本說明為什麼這樣寫，推薦哪一個？
+
+3. 跑馬燈內容 × 5條（每條15字以上）
+   限時優惠型｜社會認證型｜活動公告型｜品牌理念型｜導流型
+   說明每條的功能和使用時機
+
+4. 照片牆建議 × 5張
+   每張說明：拍什麼、怎麼拍（角度、光線、道具）、為什麼能建立信任
+
+5. CTA按鈕建議 × 5個
+   標題（5-10字）、連結類型、放第幾個、為什麼有效、使用場景
+
+6. 跑馬燈節慶更新建議
+   春節、情人節、母親節、中秋、年底各推薦一條跑馬燈`;
+
+  // ── Tab 2｜影音DNA ──
+  document.getElementById('ob2').textContent =
+`你是「幸福天使影音策略顧問」，請根據以下資料，產出完整影音品牌DNA與製作方案。
+
+${base}
+
+請產出：
+
+1. 品牌DNA完整文件
+   【說話的人】【情緒底色】【慣用語氣＋例句×3】【慣用意象×5】【禁止詞×5＋原因】【核心差異一句話】
+
+2. 平台策略（依現有：${platforms}）
+   主力平台｜為什麼｜成功關鍵×3｜發布頻率｜最佳時間｜前3個月目標
+
+3. 內容主題方向 × 3
+   標題｜為什麼適合｜具體示例×3｜製作難度（⭐~⭐⭐⭐⭐⭐）
+
+4. Hook句庫 × 9
+   痛點型×3｜反差型×3｜好奇型×3
+
+5. 第一支影音完整製作指令
+   影片主題、類型、片長、前3秒Hook、內容架構（時間軸）、結尾CTA、字幕建議、配樂方向、拍攝注意事項
+
+6. AI產圖指令 × 2（英文，DALL-E格式）
+   封面圖指令
+   品牌形象圖指令`;
+
+  // ── Tab 3｜商業閉環 ──
+  document.getElementById('ob3').textContent =
+`你是「幸福天使商業策略顧問」，請根據以下資料，設計一套完整的商業閉環方案。
+
+${base}
+
+═══════════════════════
+🔍 被看見｜流量策略
+═══════════════════════
+1. 目標客群在哪裡？3個具體渠道
+2. 每個渠道的操作方法（具體到「每週幾、幾點、發什麼」）
+${hasLocation?'3. Google地圖優化5步（可立即執行）':'3. 線上曝光優先策略'}
+4. 如何讓第一次接觸的人留下來？
+
+═══════════════════════
+🤝 被記住｜品牌記憶點
+═══════════════════════
+1. 設計一個讓人10秒記住的品牌記憶點
+2. 這個記憶點在名片、社群、影音如何一致呈現
+3. 競爭對手沒做到的差異化機會
+
+═══════════════════════
+💡 被信任｜信任建立
+═══════════════════════
+1. 這個行業建立信任最有效的3種方式
+2. 客戶見證如何收集和呈現（具體話術）
+3. 名片上哪些元素最能快速建立信任
+
+═══════════════════════
+⚡ 被成交｜成交路徑
+═══════════════════════
+1. 從看到名片到付款，畫出完整流程（文字版）
+2. 每個環節的CTA設計（按鈕標題、連結、時機）
+3. 成交率最高的場景是什麼？如何複製？
+4. 常見成交卡點和解決方法
+
+═══════════════════════
+🔄 被分享｜口碑機制
+═══════════════════════
+1. 什麼讓客戶願意主動分享？（具體條件）
+2. 設計一個自然的轉介紹機制（不推銷）
+3. 分享的最佳時機和引導話術
+
+═══════════════════════
+♻️ 回購循環
+═══════════════════════
+1. 如何讓成交過的客戶持續回來？
+2. 跑馬燈配合節慶的年度規劃
+3. 長期客戶關係維繫的3個關鍵動作
+
+═══════════════════════
+📊 閉環效益預估
+═══════════════════════
+第1個月可以達到：
+第3個月可以達到：
+第6個月可以達到：
+（誠實評估，不誇大）`;
+
+  // ── Tab 4｜交付清單 ──
+  const deliveryMap = {
+    '名片建卡': `【名片建卡｜交付清單】
+你需要交付：
+□ 品牌故事（120字）
+□ 一句話理念×3版本
+□ 跑馬燈內容×3條
+□ 照片牆拍攝建議×5張
+□ CTA按鈕建議×3個
+□ AI產圖指令
+□ 建卡所需資料整理清單
+
+客戶需要準備：
+□ 個人照（正面、清晰）
+□ 品牌LOGO（PNG透明背景）
+□ 聯繫方式（LINE、電話、Email）
+□ 服務項目×3-5項
+□ 現有社群連結
+
+時間承諾：收到素材後1個工作天完成建卡`,
+
+    '基礎': `【基礎方案｜交付清單】
+你需要交付：
+□ 品牌DNA文件
+□ 智慧名片完整建議（故事、金句、跑馬燈、CTA）
+□ 商業閉環設計
+□ 主力平台＋發布策略
+□ 內容主題×3個月規劃
+□ 影音製作指令
+□ AI產圖指令×2
+□ 素材拍攝清單
+□ 教學×1次（1-2小時，LINE視訊）
+
+客戶需要準備：
+□ 個人照或品牌照3-5張
+□ 產品服務實拍照5張以上
+□ 品牌故事素材（口述也可以）
+□ LINE連結、社群帳號
+□ 服務定價表
+
+後續支援：LINE文字諮詢（不含代操）`,
+
+    '中階': `【中階方案｜交付清單】
+首月交付：
+□ 品牌DNA文件
+□ 智慧名片完整建議
+□ 商業閉環設計
+□ 內容主題月曆（3個月）
+□ 社群帳號簡介優化文案
+
+每月持續交付：
+□ 圖文文案×8-10篇（含AI產圖指令）
+□ 短影音腳本×4支
+□ 發布時間建議表
+□ Hashtag組合（每篇5組）
+
+每月協作流程：
+① 月初確認主題（LINE 10分鐘）
+② 文案產出→客戶審核（3個工作天）
+③ 客戶一次修改
+④ 客戶自行發布`,
+
+    '全包': `【全包代操｜交付清單】
+首月建置：
+□ 品牌DNA文件
+□ 智慧名片完整建卡
+□ 商業閉環＋年度內容規劃
+□ 社群帳號全面優化
+□ 發布排程系統建立
+
+每月執行：
+□ 圖文貼文×12篇以上（含圖片＋排程發布）
+□ 短影音腳本×6-8支
+□ 社群帳號管理（回覆留言、互動）
+□ 月底數據報告（觸及、互動、成長）
+□ 下月策略調整建議
+
+客戶只需要配合：
+□ 首月提供品牌素材
+□ 每月月初30分鐘確認會議
+□ 即時提供新品、活動、優惠資訊
+□ 持續收集客戶見證`
+  };
+
+  document.getElementById('ob4').textContent =
+`你是「幸福天使品牌顧問」，請根據以下資料和交付清單，產出具體的執行說明。
+
+${base}
+
+${deliveryMap[plan]||''}
+
+請補充說明：
+1. 針對「${industry}」行業，素材準備有哪些特別注意事項？
+2. 這個方案完成後，客戶合理可以期待什麼成果？（誠實，不誇大）
+3. 這個行業常見的執行卡點是什麼？如何避免？
+4. 商業閉環哪個環節最關鍵？為什麼？`;
+
+  // ── Tab 5｜時間軸 ──
+  const wk = { '名片建卡': 1, '基礎': 2, '中階': 4, '全包': 4 };
+  document.getElementById('ob5').textContent =
+`你是「幸福天使品牌顧問」，請根據以下資料，產出具體可執行的${wk[plan]||2}週時間軸。
+
+${base}
+
+格式：
+【第X週】主題標題
+你需要做：（每項具體動作）
+客戶需要配合：（具體動作）
+本週完成：（具體交付成果）
+注意事項：（可能的卡點和解決方法）
+
+要求：
+1. 每個動作要具體，不能說「準備素材」，要說「拍5張個人品牌照，注意純色背景」
+2. 分清楚你做什麼、客戶做什麼
+3. 說明${wk[plan]||2}週後客戶的狀態
+4. 根據行業「${industry}」特性調整節奏
+5. 商業閉環各環節從哪週開始啟動？`;
+
+  // ── Tab 6｜LINE摘要 ──
+  document.getElementById('ob6').textContent =
+`你是「幸福天使品牌顧問」，請根據以下資料，產出可以直接貼到LINE傳給客戶的品牌方案摘要。
+
+${base}
+
+格式要求：
+1. 手機看起來舒服，用換行和Emoji分段
+2. 客戶看完要知道「我下一步做什麼」
+
+請產出：
+
+☀️ 你的品牌方向（3-4行）
+
+📇 名片建議重點
+・一句話理念（最推薦1個版本，直接給出）
+・跑馬燈（最推薦1條，直接給出）
+・最重要的CTA（1個，說明原因）
+
+🔄 你的商業閉環
+（3-4行說清楚：客戶怎麼找到你→怎麼信任你→怎麼成交→怎麼介紹朋友）
+
+🎬 影音建議
+・建議平台：
+・第一支影音方向：（具體主題）
+・最強Hook句：（直接給出）
+
+📋 你現在需要準備
+（3-5個最重要的素材，按優先順序）
+
+⏰ 下一步行動
+（告訴客戶接下來怎麼配合，具體到今天可以做什麼）
+
+結尾：溫暖、專業、讓客戶期待合作的一句話`;
+
+  document.getElementById('resultB').classList.add('show');
+  document.getElementById('resultB').scrollIntoView({ behavior: 'smooth' });
+}
+
+// ─── Tab切換 ───
+function swA(idx,el) {
+  document.querySelectorAll('#panelA .tab').forEach((t,i)=>t.classList.toggle('on',i===idx));
+  document.querySelectorAll('#panelA .tab-pane').forEach((t,i)=>t.classList.toggle('on',i===idx));
+}
+function swB(idx,el) {
+  document.querySelectorAll('#panelB .tab').forEach((t,i)=>t.classList.toggle('on',i===idx));
+  document.querySelectorAll('#panelB .tab-pane').forEach((t,i)=>t.classList.toggle('on',i===idx));
+}
+
+// ─── 複製 ───
+function cp(id,btn) {
+  navigator.clipboard.writeText(document.getElementById(id).textContent).then(()=>{
+    btn.textContent='✓ 已複製'; btn.classList.add('done');
+    setTimeout(()=>{ btn.textContent='複製'; btn.classList.remove('done'); },2000);
+  });
+}
+function copyAllA() {
+  const texts = ['oa0','oa1','oa2'].map(id=>document.getElementById(id).textContent).join('\n\n═══════════════\n\n');
+  navigator.clipboard.writeText(texts).then(()=>{
+    const b=document.getElementById('caA'); b.textContent='✓'; b.classList.add('done');
+    setTimeout(()=>{ b.textContent='複製全部'; b.classList.remove('done'); },2000);
+  });
+}
+function copyAllB() {
+  const texts = ['ob0','ob1','ob2','ob3','ob4','ob5','ob6'].map(id=>document.getElementById(id).textContent).join('\n\n═══════════════\n\n');
+  navigator.clipboard.writeText(texts).then(()=>{
+    const b=document.getElementById('caB'); b.textContent='✓'; b.classList.add('done');
+    setTimeout(()=>{ b.textContent='複製全部'; b.classList.remove('done'); },2000);
+  });
+}
+
+// ─── 清除 ───
+function clrA() {
+  if(!confirm('確定清除？'))return;
+  document.getElementById('codeA').value='';
+  document.getElementById('phoneA').value='';
+  document.getElementById('statusA').textContent='';
+  document.getElementById('prevA').classList.remove('show');
+  document.getElementById('resultA').classList.remove('show');
+  DA={};
+}
+function clrB() {
+  if(!confirm('確定清除？'))return;
+  document.getElementById('codeB').value='';
+  document.getElementById('phoneB').value='';
+  document.getElementById('statusB').textContent='';
+  document.getElementById('prevB').classList.remove('show');
+  document.getElementById('resultB').classList.remove('show');
+  document.querySelectorAll('.plan-opt').forEach(o=>o.classList.remove('sel'));
+  document.querySelectorAll('input[name="plan"]').forEach(r=>r.checked=false);
+  DB={};
+}
+
+// ─── 工具 ───
+function planVal() { const el=document.querySelector('input[name="plan"]:checked'); return el?el.value:''; }
+document.addEventListener('change',e=>{
+  if(e.target.name==='plan'){
+    document.querySelectorAll('.plan-opt').forEach(o=>o.classList.remove('sel'));
+    e.target.closest('.plan-opt').classList.add('sel');
+  }
+});
+</script>
+</body>
+</html>
