@@ -212,6 +212,16 @@
           <div class="photo-grid" id="photoGridB"></div>
           <div class="photo-section-hint" id="photoHintB"></div>
         </div>
+        <div class="flow-box" id="flowBoxB" style="display:none;margin-top:10px;">
+          <div class="flow-box-title">📋 顧問操作流程</div>
+          <div class="flow-section">
+            <div class="flow-section-label">評量工具｜選完方案後使用</div>
+            <div class="flow-btns" style="grid-template-columns:1fr;">
+              <button class="flow-btn gold" onclick="copyAssessmentLink()">📊 傳自我評量連結<br><span style="font-weight:400;opacity:.6;font-size:10px;">請先選方案 → 複製後傳給客戶填寫</span></button>
+            </div>
+          </div>
+          <div class="flow-msg" id="flowMsgB"></div>
+        </div>
       </div>
       <div class="step-label"><div class="step-num">3</div><div class="step-text">選擇合作方案</div><div class="step-line"></div></div>
       <div class="card">
@@ -501,7 +511,7 @@ async function queryB(type){
   try{
     const r=await fetch(GAS,{method:'POST',body:JSON.stringify(type==='code'?{action:'queryByCode',payload:{code:val,sheet:'material'}}:{action:'queryByPhone',payload:{phone:val,sheet:'material'}})});
     const d=await r.json();
-    if(d.ok&&d.row){DB=d.row;s.textContent='✓ 找到：'+(DB['姓名品牌名稱']||'客戶');s.className='query-status ok';renderPreviewB();renderPhotos(DB);}
+    if(d.ok&&d.row){DB=d.row;s.textContent='✓ 找到：'+(DB['姓名品牌名稱']||'客戶');s.className='query-status ok';renderPreviewB();renderPhotos(DB);document.getElementById('flowBoxB').style.display='block';}
     else{s.textContent='找不到，'+(d.message||'請確認代碼或電話');s.className='query-status err';DB={};document.getElementById('prevB').classList.remove('show');document.getElementById('photoAreaB').style.display='none';}
   }catch(e){s.textContent='查詢失敗，請檢查網路';s.className='query-status err';}
 }
@@ -1266,10 +1276,38 @@ function copyAllB(){const t=['ob0','ob1','ob2','ob3','ob4','ob5','ob6'].map(id=>
 
 // ── 清除 ──
 function clrA(){if(!confirm('確定清除？'))return;document.getElementById('codeA').value='';document.getElementById('phoneA').value='';document.getElementById('statusA').textContent='';document.getElementById('prevA').classList.remove('show');document.getElementById('flowBoxA').style.display='none';document.getElementById('resultA').classList.remove('show');DA={};}
-function clrB(){if(!confirm('確定清除？'))return;document.getElementById('codeB').value='';document.getElementById('phoneB').value='';document.getElementById('statusB').textContent='';document.getElementById('prevB').classList.remove('show');document.getElementById('photoAreaB').style.display='none';document.getElementById('resultB').classList.remove('show');document.querySelectorAll('.plan-opt').forEach(o=>o.classList.remove('sel'));document.querySelectorAll('input[name="plan"]').forEach(r=>r.checked=false);DB={};}
+function clrB(){if(!confirm('確定清除？'))return;document.getElementById('codeB').value='';document.getElementById('phoneB').value='';document.getElementById('statusB').textContent='';document.getElementById('prevB').classList.remove('show');document.getElementById('photoAreaB').style.display='none';document.getElementById('flowBoxB').style.display='none';document.getElementById('resultB').classList.remove('show');document.querySelectorAll('.plan-opt').forEach(o=>o.classList.remove('sel'));document.querySelectorAll('input[name="plan"]').forEach(r=>r.checked=false);DB={};}
 
 function planVal(){const el=document.querySelector('input[name="plan"]:checked');return el?el.value:'';}
 document.addEventListener('change',e=>{if(e.target.name==='plan'){document.querySelectorAll('.plan-opt').forEach(o=>o.classList.remove('sel'));e.target.closest('.plan-opt').classList.add('sel');}});
+
+function copyAssessmentLink(){
+  const name=DB['姓名品牌名稱']||DA['姓名']||'您';
+  const code=(DA['查詢代碼']||DB['查詢代碼']||'').toUpperCase();
+  const plan=planVal();
+  const msgEl=document.getElementById('flowMsgB');
+  function bMsg(t){if(msgEl){msgEl.textContent=t;setTimeout(()=>{msgEl.textContent='';},2500);}}
+  if(!code){bMsg('⚠️ 請先查詢客戶資料');return;}
+  if(!plan){bMsg('⚠️ 請先選擇合作方案（步驟3）');return;}
+  const url='https://angel0973180707.github.io/Angel-Diagnosis-System/assessment.html?diag='+code+'&plan='+encodeURIComponent(plan);
+  const text=`━━━━━━━━━━━━━━━━
+☀️ 幸福天使｜經營自我評量
+
+${name} 您好
+
+在開始規劃品牌方案之前
+請花3分鐘完成這份自我評量
+
+幫助我更了解您的現況
+讓方案更貼近您真正的需求 ☀️
+
+👉 ${url}
+
+填完後請讓我知道
+我會根據您的評量結果調整建議方向
+━━━━━━━━━━━━━━━━`;
+  navigator.clipboard.writeText(text).then(()=>bMsg('✓ 評量連結已複製，可直接貼到LINE'));
+}
 </script>
 </body>
 </html>
